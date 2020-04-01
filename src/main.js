@@ -13,7 +13,7 @@ const createProfileTemplate = () => {
       <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`
   );
-}
+};
 
 // Меню (фильтры и статистика)
 const createMenuTemplate = () => {
@@ -28,7 +28,7 @@ const createMenuTemplate = () => {
       <a href="#stats" class="main-navigation__additional">Stats</a>
     </nav>`
   );
-}
+};
 
 // Контент
 const createContentTemplate = () => {
@@ -36,12 +36,12 @@ const createContentTemplate = () => {
     `<section class="films">
     </section>`
   );
-}
+};
 
 // Секция со списками фильмов. Содержит заголовок и контейнер списка
 const createFilmListTemplate = (title, isTitleHidden, isExtraModifier) => {
-  const visuallyHidden = isTitleHidden ? 'visually-hidden' : '';
-  const extraModifier = isExtraModifier ? 'films-list--extra' : '';
+  const visuallyHidden = isTitleHidden ? `visually-hidden` : ``;
+  const extraModifier = isExtraModifier ? `films-list--extra` : ``;
   return (
     `<section class="films-list ${extraModifier}">
       <h2 class="films-list__title ${visuallyHidden}">${title}</h2>
@@ -49,7 +49,7 @@ const createFilmListTemplate = (title, isTitleHidden, isExtraModifier) => {
       </div>
     </section>`
   );
-}
+};
 
 // Карточка фильма
 const createFilmTemplate = () => {
@@ -72,19 +72,20 @@ const createFilmTemplate = () => {
       </form>
     </article>`
   );
-}
+};
 
 // Кнопка «Show more»
 const createShowMoreButtonTemplate = () => {
   return (
     `<button class="films-list__show-more">Show more</button>`
   );
-}
+};
 
 // Подробная информация о фильме (попап)
-const createFilmDetailsTemplate = () => {
+const createFilmDetailsTemplate = (isHidden) => {
+  const visuallyHidden = isHidden ? `visually-hidden` : ``;
   return (
-    `<section class="film-details">
+    `<section class="film-details ${visuallyHidden}">
       <form class="film-details__inner" action="" method="get">
         <div class="form-details__top-container">
           <div class="film-details__close">
@@ -254,10 +255,10 @@ const createFilmDetailsTemplate = () => {
       </form>
     </section>`
   );
-}
+};
 
 // Отрисовка (вставка в DOM) компонентов
-const render = (container, text, place = 'beforeend') => {
+const render = (container, text, place = `beforeend`) => {
   container.insertAdjacentHTML(place, text);
 };
 
@@ -265,40 +266,45 @@ const render = (container, text, place = 'beforeend') => {
 // Возвращает контейнер (в секции) в который можно добавлять карточки фильмов
 const renderFilmList = (container, text) => {
   render(container, text);
-  return container.querySelector('.films-list:last-child > .films-list__container');
-}
+  return container.querySelector(`.films-list:last-child > .films-list__container`);
+};
 
 // Отрисовка карточек фильмов в контейнере
 const renderFilmCards = (container, text, filmCount) => {
   for (let i = 0; i < filmCount; i++) {
     render(container, text);
   }
-}
+};
 
 // Шапка сайта с профилем (звание) пользователя
-const siteHeaderElement = document.querySelector('.header');
+const siteHeaderElement = document.querySelector(`.header`);
 render(siteHeaderElement, createProfileTemplate());
 
 // Меню сайта
-const siteMainElement = document.querySelector('.main');
+const siteMainElement = document.querySelector(`.main`);
 render(siteMainElement, createMenuTemplate());
 
 // Основной контент: списки фильмов
 render(siteMainElement, createContentTemplate());
-const mainContentElement = siteMainElement.querySelector('.films');
+const mainContentElement = siteMainElement.querySelector(`.films`);
 
 let containerElement;
 
 // Filtered films
-containerElement = renderFilmList(mainContentElement, createFilmListTemplate('All movies. Upcoming', true, false));
+containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`All movies. Upcoming`, true, false));
 renderFilmCards(containerElement, createFilmTemplate(), FILM_COUNT);
 // Top rated films
-containerElement = renderFilmList(mainContentElement, createFilmListTemplate('Top rated', false, true));
+containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Top rated`, false, true));
 renderFilmCards(containerElement, createFilmTemplate(), EXTRA_FILM_COUNT);
 // Most commented films
-containerElement = renderFilmList(mainContentElement, createFilmListTemplate('Most commented', false, true));
+containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Most commented`, false, true));
 renderFilmCards(containerElement, createFilmTemplate(), EXTRA_FILM_COUNT);
 
 // Добавление кнопки "Show more" после списка отфильтрованных фильмов
-const filmListElement = mainContentElement.querySelector('.films-list');
+const filmListElement = mainContentElement.querySelector(`.films-list`);
 render(filmListElement, createShowMoreButtonTemplate());
+
+// Отрисовка дополнительной информации о фильме
+const siteFooterElement = document.querySelector(`.footer`);
+// Чтобы popup не закрывал весь контент, по умолчанию он скрытый
+render(siteFooterElement, createFilmDetailsTemplate(true), `afterend`);
