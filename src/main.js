@@ -270,9 +270,9 @@ const renderFilmList = (container, text) => {
 };
 
 // Отрисовка карточек фильмов в контейнере
-const renderFilmCards = (container, text, filmCount) => {
+const renderFilmCards = (container, template, filmCount) => {
   for (let i = 0; i < filmCount; i++) {
-    render(container, text);
+    render(container, template());
   }
 };
 
@@ -292,13 +292,13 @@ let containerElement;
 
 // Filtered films
 containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`All movies. Upcoming`, true, false));
-renderFilmCards(containerElement, createFilmTemplate(), FILM_COUNT);
+renderFilmCards(containerElement, createFilmTemplate, FILM_COUNT);
 // Top rated films
 containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Top rated`, false, true));
-renderFilmCards(containerElement, createFilmTemplate(), EXTRA_FILM_COUNT);
+renderFilmCards(containerElement, createFilmTemplate, EXTRA_FILM_COUNT);
 // Most commented films
 containerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Most commented`, false, true));
-renderFilmCards(containerElement, createFilmTemplate(), EXTRA_FILM_COUNT);
+renderFilmCards(containerElement, createFilmTemplate, EXTRA_FILM_COUNT);
 
 // Добавление кнопки "Show more" после списка отфильтрованных фильмов
 const filmListElement = mainContentElement.querySelector(`.films-list`);
