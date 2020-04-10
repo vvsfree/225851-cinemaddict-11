@@ -7,8 +7,7 @@ const createButtonMarkup = (text, modifier, isActive) => {
 };
 
 export const createFilmTemplate = (film) => {
-  // TODO: spread вложенный
-  const {title, rating, year, runtime, genres, poster, summary, comments, userInfo} = film;
+  const {title, rating, year, runtime, genres, poster, summary, comments, userInfo: {isWaiting, isWatched, isFavorite}} = film;
 
   return (
     `<article class="film-card">
@@ -23,9 +22,9 @@ export const createFilmTemplate = (film) => {
       <p class="film-card__description">${summary}</p>
       <a class="film-card__comments">${comments.length} comments</a>
       <form class="film-card__controls">
-        ${createButtonMarkup(`Add to watchlist`, `add-to-watchlist`, userInfo.isWaiting)}
-        ${createButtonMarkup(`Mark as watched`, `mark-as-watched`, userInfo.isWatched)}
-        ${createButtonMarkup(`Mark as favorite`, `favorite`, userInfo.isFavorite)}
+        ${createButtonMarkup(`Add to watchlist`, `add-to-watchlist`, isWaiting)}
+        ${createButtonMarkup(`Mark as watched`, `mark-as-watched`, isWatched)}
+        ${createButtonMarkup(`Mark as favorite`, `favorite`, isFavorite)}
       </form>
     </article>`
   );

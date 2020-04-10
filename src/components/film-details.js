@@ -36,12 +36,37 @@ const createButtonMarkup = (text, name, isActive) => {
   );
 };
 
+const generateDetailsTableRow = (key, value) => {
+  return (
+    `<tr class="film-details__row">
+      <td class="film-details__term">${key}</td>
+      <td class="film-details__cell">${value}</td>
+    </tr>`
+  );
+};
+
 const createGenreMarkup = (genre) => {
   return `<span class="film-details__genre">${genre}</span>`;
 };
 
 const createFilmDetailsTemplate = (film, isHidden) => {
-  const {largePoster, title, originalTitle, rating, ageRating, director, writers, actors, releaseDate, runtime, country, genres, description, comments, userInfo} = film;
+  const {
+    largePoster,
+    title,
+    originalTitle,
+    rating,
+    ageRating,
+    director,
+    writers,
+    actors,
+    releaseDate,
+    runtime,
+    country,
+    genres,
+    description,
+    comments,
+    userInfo: {isWaiting, isWatched, isFavorite}
+  } = film;
   const visuallyHidden = isHidden ? `visually-hidden` : ``;
 
   const genresMarkup = genres.map(createGenreMarkup).join(`\n`);
@@ -74,34 +99,13 @@ const createFilmDetailsTemplate = (film, isHidden) => {
               </div>
 
               <table class="film-details__table">
-                <tr class="film-details__row">
-                  <td class="film-details__term">Director</td>
-                  <td class="film-details__cell">${director}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Writers</td>
-                  <td class="film-details__cell">${writers.join(`, `)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Actors</td>
-                  <td class="film-details__cell">${actors.join(`, `)}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Release Date</td>
-                  <td class="film-details__cell">${releaseDate}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Runtime</td>
-                  <td class="film-details__cell">${runtime}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Country</td>
-                  <td class="film-details__cell">${country}</td>
-                </tr>
-                <tr class="film-details__row">
-                  <td class="film-details__term">Genre${genres.length > 1 ? `s` : ``}</td>
-                  <td class="film-details__cell">${genresMarkup}</td>
-                </tr>
+                ${generateDetailsTableRow(`Director`, director)}
+                ${generateDetailsTableRow(`Writers`, writers.join(`, `))}
+                ${generateDetailsTableRow(`Actors`, actors.join(`, `))}
+                ${generateDetailsTableRow(`Release Date`, releaseDate)}
+                ${generateDetailsTableRow(`Runtime`, runtime)}
+                ${generateDetailsTableRow(`Country`, country)}
+                ${generateDetailsTableRow(`Genre${genres.length > 1 ? `s` : ``}`, genresMarkup)}
               </table>
 
               <p class="film-details__film-description">
@@ -111,9 +115,9 @@ const createFilmDetailsTemplate = (film, isHidden) => {
           </div>
 
           <section class="film-details__controls">
-            ${createButtonMarkup(`Add to watchlist`, `watchlist`, userInfo.isWaiting)}
-            ${createButtonMarkup(`Mark as watched`, `watched`, userInfo.isWatched)}
-            ${createButtonMarkup(`Mark as favorite`, `favorite`, userInfo.isFavorite)}
+            ${createButtonMarkup(`Add to watchlist`, `watchlist`, isWaiting)}
+            ${createButtonMarkup(`Mark as watched`, `watched`, isWatched)}
+            ${createButtonMarkup(`Mark as favorite`, `favorite`, isFavorite)}
           </section>
         </div>
 

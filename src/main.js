@@ -19,6 +19,8 @@ import {createFilmDetailsTemplate} from "./components/film-details.js";
 import {generateProfile} from "./mock/profile.js";
 import {generateFilms} from "./mock/film.js";
 import {generateFilters} from "./mock/filter.js";
+// Данные по фильмам в категориях Top rated и Most commented
+import {getTopRatedFilms, getMostCommentedFilms} from "./mock/extra-film.js";
 
 // Количество отображаемых фильмов
 const FILM_COUNT = 30;
@@ -82,12 +84,12 @@ renderFilmCards(filmListContainerElement, films.slice(0, showingFilmCount));
 let extraFilmListContainerElement;
 
 // Top rated films
-const topRatedFilms = generateFilms(EXTRA_FILM_COUNT);
+const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
 extraFilmListContainerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Top rated`, false, true));
 renderFilmCards(extraFilmListContainerElement, topRatedFilms);
 
 // Most commented films
-const mostCommentedFilms = generateFilms(EXTRA_FILM_COUNT);
+const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
 extraFilmListContainerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Most commented`, false, true));
 renderFilmCards(extraFilmListContainerElement, mostCommentedFilms);
 

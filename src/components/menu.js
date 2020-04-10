@@ -1,6 +1,5 @@
 export const createMenuTemplate = (filter) => {
   const {watchlist, history, favorites} = filter;
-  // TODO: разбить и это на части? По аналогии с task manager
   return (
     `<nav class="main-navigation">
       <div class="main-navigation__items">

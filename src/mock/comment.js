@@ -1,7 +1,4 @@
-// TODO: temp. Для красоты пока что ))
-// TODO: форматирование дат. Например: 2 days ago )), today, 2019/12/31 23:59
-// TODO: emoji брать из emoji.js
-const knownComments = [
+const SAMPLE_COMMENTS = [
   {
     emoji: `smile`,
     text: `Interesting setting and a good cast`,
@@ -20,23 +17,29 @@ const knownComments = [
   }, {
     emoji: `angry`,
     text: `Almost two hours? Seriously?`,
-    author: `John Doe`,
+    author: `Milla Jovovich`,
     day: `Today`
+  }, {
+    emoji: `smile`,
+    text: `First here! ))`,
+    author: `Bro`,
+    day: `Today`
+  }, {
+    emoji: `sleeping`,
+    text: `I'm a dog tired watching this "masterpiece" ... h-r-r`,
+    author: `Film expert`,
+    day: `some days ago`
   }
 ];
 
-const getRandomIntegerNumber = (min, max) => {
-  return min + Math.floor(Math.random() * (max - min));
-};
-
-const generateComment = (count) => {
-  return knownComments[getRandomIntegerNumber(0, count)];
+const shuffle = (arr) => {
+  return arr.sort(() => {
+    return Math.random() - 0.5;
+  });
 };
 
 const generateComments = (count) => {
-  return new Array(count)
-    .fill(``)
-    .map(() => generateComment(count));
+  return shuffle(SAMPLE_COMMENTS.slice()).slice(0, count);
 };
 
 export {generateComments};
