@@ -3,7 +3,7 @@ const getTopRatedFilms = (films, count) => {
 };
 
 const getMostCommentedFilms = (films, count) => {
-  return films.slice().sort((a, b) => Number(b.comments.length) - Number(a.comments.length)).slice(0, count);
+  return films.slice().sort((a, b) => b.comments.length - a.comments.length).slice(0, count);
 };
 
 export {getTopRatedFilms, getMostCommentedFilms};
