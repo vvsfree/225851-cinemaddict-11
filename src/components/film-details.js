@@ -1,3 +1,4 @@
+import {createElement} from "../utils.js";
 import {getEmojis} from "../mock/emoji.js";
 
 const createEmojiMarkup = (emoji) => {
@@ -49,7 +50,7 @@ const createGenreMarkup = (genre) => {
   return `<span class="film-details__genre">${genre}</span>`;
 };
 
-const createFilmDetailsTemplate = (film, isHidden) => {
+const createFilmDetailsTemplate = (film) => {
   const {
     largePoster,
     title,
@@ -67,13 +68,12 @@ const createFilmDetailsTemplate = (film, isHidden) => {
     comments,
     userInfo: {isWaiting, isWatched, isFavorite}
   } = film;
-  const visuallyHidden = isHidden ? `visually-hidden` : ``;
 
   const genresMarkup = genres.map(createGenreMarkup).join(`\n`);
   const commentsMarkup = comments.map(createCommentMarkup).join(`\n`);
 
   return (
-    `<section class="film-details ${visuallyHidden}">
+    `<section class="film-details">
       <form class="film-details__inner" action="" method="get">
         <div class="form-details__top-container">
           <div class="film-details__close">
@@ -150,4 +150,25 @@ const createFilmDetailsTemplate = (film, isHidden) => {
 // Emojis не динамические данные, достаточно запустить один раз во время создания модуля
 const emojisMarkup = getEmojis().map(createEmojiMarkup).join(`\n`);
 
-export {createFilmDetailsTemplate};
+export default class Profile {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmDetailsTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
