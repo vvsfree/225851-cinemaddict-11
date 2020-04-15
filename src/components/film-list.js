@@ -1,27 +1,26 @@
 import {createElement} from "../utils.js";
 
-const createFilmListTemplate = (title, isExtra) => {
-  const visuallyHidden = isExtra ? `` : `visually-hidden`;
-  const extraModifier = isExtra ? `films-list--extra` : ``;
+const createFilmListTemplate = (config) => {
+  const {title, isTitleHidden = false, hasExtraModifier = false} = config;
+
+  const visuallyHidden = isTitleHidden ? `visually-hidden` : ``;
+  const extraModifier = hasExtraModifier ? `films-list--extra` : ``;
   return (
     `<section class="films-list ${extraModifier}">
       <h2 class="films-list__title ${visuallyHidden}">${title}</h2>
-      <div class="films-list__container">
-      </div>
     </section>`
   );
 };
 
 export default class FilmList {
-  constructor(title, isExtra) {
-    this._title = title;
-    this._isExtra = isExtra;
-
+  constructor(config) {
+    this._config = config;
     this._element = null;
+    this._innerContainerElement = null;
   }
 
   getTemplate() {
-    return createFilmListTemplate(this._title, this._isExtra);
+    return createFilmListTemplate(this._config);
   }
 
   getElement() {
@@ -33,7 +32,12 @@ export default class FilmList {
   }
 
   getContainerElement() {
-    return this.getElement().querySelector(`.films-list__container`);
+    if (!this._innerContainerElement) {
+      this._innerContainerElement = createElement(`<div class="films-list__container"></div>`);
+      this.getElement().append(this._innerContainerElement);
+    }
+
+    return this._innerContainerElement;
   }
 
   removeElement() {

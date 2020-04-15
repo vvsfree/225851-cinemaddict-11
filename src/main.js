@@ -28,16 +28,33 @@ import {getTopRatedFilms, getMostCommentedFilms} from "./mock/extra-film.js";
 import {render, RenderPosition} from "./utils.js";
 
 // Количество отображаемых фильмов
-const FILM_COUNT = 12;
+const FILM_COUNT = 14;
 const SHOWING_FILM_COUNT_ON_START = 5;
 const SHOWING_FILM_COUNT_BY_BUTTON = 5;
 
 // Количество фильмов в блоках «Top rated movies» и «Most commented»
 const EXTRA_FILM_COUNT = 2;
 
+// Удаление из DOM элемента соответствующего переданному компоненту
 const removeComponent = (component) => {
   if (component) {
     component.getElement().remove();
+  }
+};
+
+// Удаление из DOM элемента детальной информации по фильме
+const removeFilmDetailsComponent = () => {
+  removeComponent(visibleFilmDetailsComponent);
+  visibleFilmDetailsComponent = null;
+  document.removeEventListener(`keydown`, escKeyDownHandler);
+};
+
+// Обработчик события нажатия клавиши Escape
+const escKeyDownHandler = (evt) => {
+  const isEscKey = evt.key === `Escape` || evt.key === `Esc`;
+
+  if (isEscKey) {
+    removeFilmDetailsComponent();
   }
 };
 
@@ -45,8 +62,7 @@ const renderFilm = (container, film) => {
   const filmDetailsComponent = new FilmDetailsComponent(film);
   const filmDetailsCloseBtn = filmDetailsComponent.getElement().querySelector(`.film-details__close-btn`);
   filmDetailsCloseBtn.addEventListener(`click`, () => {
-    removeComponent(filmDetailsComponent);
-    visibleFilmDetailsComponent = null;
+    removeFilmDetailsComponent();
   });
 
   const filmComponent = new FilmComponent(film);
@@ -58,6 +74,7 @@ const renderFilm = (container, film) => {
       removeComponent(visibleFilmDetailsComponent);
       render(siteFooterElement, filmDetailsComponent.getElement(), RenderPosition.AFTER);
       visibleFilmDetailsComponent = filmDetailsComponent;
+      document.addEventListener(`keydown`, escKeyDownHandler);
     });
   });
 
@@ -74,8 +91,14 @@ const renderFilms = () => {
   const filmsComponent = new FilmsComponent();
   render(siteMainElement, filmsComponent.getElement());
 
+  if (films.length === 0) {
+    const noFilmList = new FilmListComponent({title: `There are no movies in our database`});
+    render(filmsComponent.getElement(), noFilmList.getElement());
+    return;
+  }
+
   // Все фильмы (отфильтрованные фильмы)
-  const mainFilmList = new FilmListComponent(`All movies. Upcoming`, false);
+  const mainFilmList = new FilmListComponent({title: `All movies. Upcoming`, isTitleHidden: true});
   render(filmsComponent.getElement(), mainFilmList.getElement());
 
   let showingFilmCount = SHOWING_FILM_COUNT_ON_START;
@@ -100,13 +123,13 @@ const renderFilms = () => {
 
   // Top rated фильмы
   const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
-  const topRatedFilmList = new FilmListComponent(`Top rated`, true);
+  const topRatedFilmList = new FilmListComponent({title: `Top rated`, hasExtraModifier: true});
   render(filmsComponent.getElement(), topRatedFilmList.getElement());
   renderFilmCollection(topRatedFilmList, topRatedFilms);
 
   // Most commented фильмы
   const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
-  const mostCommentedFilmList = new FilmListComponent(`Most commented`, true);
+  const mostCommentedFilmList = new FilmListComponent({title: `Most commented`, hasExtraModifier: true});
   render(filmsComponent.getElement(), mostCommentedFilmList.getElement());
   renderFilmCollection(mostCommentedFilmList, mostCommentedFilms);
 };
