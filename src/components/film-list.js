@@ -33,7 +33,7 @@ export default class FilmList {
   }
 
   getContainerElement() {
-    return this.getElement().children[1];
+    return this.getElement().querySelector(`.films-list__container`);
   }
 
   removeElement() {
