@@ -1,19 +1,21 @@
 // Звание пользователя
-import {createProfileTemplate} from "./components/profile.js";
+import ProfileComponent from "./components/profile.js";
 // Меню (фильтры и статистика)
-import {createMenuTemplate} from "./components/menu.js";
-// Контент
-import {createContentTemplate} from "./components/content.js";
+import MenuComponent from "./components/menu.js";
+// Сортировка
+import SortComponent from "./components/sort.js";
+// Секция фильмов (основной контент)
+import FilmsComponent from "./components/films.js";
 // Секция со списками фильмов. Содержит заголовок и контейнер списка
-import {createFilmListTemplate} from "./components/film-list.js";
+import FilmListComponent from "./components/film-list.js";
 // Карточка фильма
-import {createFilmTemplate} from "./components/film.js";
-// Кнопка «Show more»
-import {createShowMoreButtonTemplate} from "./components/show-more-button.js";
-// Количество фильмов
-import {createFooterStatisticsTemplate} from "./components/footer.js";
+import FilmComponent from "./components/film.js";
 // Подробная информация о фильме (попап)
-import {createFilmDetailsTemplate} from "./components/film-details.js";
+import FilmDetailsComponent from "./components/film-details.js";
+// Кнопка «Show more»
+import ShowMoreButtonComponent from "./components/show-more-button.js";
+// Количество фильмов
+import FooterStatsComponent from "./components/footer-stats.js";
 
 // Генерация объектов
 import {generateProfile} from "./mock/profile.js";
@@ -22,90 +24,116 @@ import {generateFilters} from "./mock/filter.js";
 // Данные по фильмам в категориях Top rated и Most commented
 import {getTopRatedFilms, getMostCommentedFilms} from "./mock/extra-film.js";
 
+// Отрисовка элементов
+import {render, RenderPosition} from "./utils.js";
+
 // Количество отображаемых фильмов
-const FILM_COUNT = 30;
+const FILM_COUNT = 12;
 const SHOWING_FILM_COUNT_ON_START = 5;
 const SHOWING_FILM_COUNT_BY_BUTTON = 5;
 
 // Количество фильмов в блоках «Top rated movies» и «Most commented»
 const EXTRA_FILM_COUNT = 2;
 
-// Отрисовка (вставка в DOM) компонентов
-const render = (container, text, place = `beforeend`) => {
-  container.insertAdjacentHTML(place, text);
+const removeComponent = (component) => {
+  if (component) {
+    component.getElement().remove();
+  }
 };
 
-// Отрисовка секции списка фильмов
-// Возвращает контейнер (в секции) в который можно добавлять карточки фильмов
-const renderFilmList = (container, text) => {
-  render(container, text);
-  return container.querySelector(`.films-list:last-child > .films-list__container`);
+const renderFilm = (container, film) => {
+  const filmDetailsComponent = new FilmDetailsComponent(film);
+  const filmDetailsCloseBtn = filmDetailsComponent.getElement().querySelector(`.film-details__close-btn`);
+  filmDetailsCloseBtn.addEventListener(`click`, () => {
+    removeComponent(filmDetailsComponent);
+    visibleFilmDetailsComponent = null;
+  });
+
+  const filmComponent = new FilmComponent(film);
+  const filmElement = filmComponent.getElement();
+  const targetClasses = [`poster`, `title`, `comments`].map((it) => `.film-card__${it}`).join(`,`);
+
+  filmElement.querySelectorAll(targetClasses).forEach((target) => {
+    target.addEventListener(`click`, () => {
+      removeComponent(visibleFilmDetailsComponent);
+      render(siteFooterElement, filmDetailsComponent.getElement(), RenderPosition.AFTER);
+      visibleFilmDetailsComponent = filmDetailsComponent;
+    });
+  });
+
+  render(container, filmComponent.getElement());
 };
 
-// Отрисовка карточек фильмов в контейнере
-const renderFilmCards = (container, data) => {
-  data.forEach((item) => {
-    render(container, createFilmTemplate(item));
+const renderFilmCollection = (filmList, filmCollection) => {
+  filmCollection.forEach((film) => {
+    renderFilm(filmList.getContainerElement(), film);
   });
 };
 
-const showMoreButtonClickHandler = (evt) => {
-  const prevFilmCount = showingFilmCount;
-  showingFilmCount += SHOWING_FILM_COUNT_BY_BUTTON;
+const renderFilms = () => {
+  const filmsComponent = new FilmsComponent();
+  render(siteMainElement, filmsComponent.getElement());
 
-  renderFilmCards(filmListContainerElement, films.slice(prevFilmCount, showingFilmCount));
+  // Все фильмы (отфильтрованные фильмы)
+  const mainFilmList = new FilmListComponent(`All movies. Upcoming`, false);
+  render(filmsComponent.getElement(), mainFilmList.getElement());
 
-  if (showingFilmCount >= films.length) {
-    evt.target.remove();
+  let showingFilmCount = SHOWING_FILM_COUNT_ON_START;
+  renderFilmCollection(mainFilmList, films.slice(0, showingFilmCount));
+
+  // Добавление кнопки "Show more" после списка отфильтрованных фильмов
+  const showMoreButtonComponent = new ShowMoreButtonComponent();
+  showMoreButtonComponent.getElement().addEventListener(`click`, () => {
+    const prevFilmCount = showingFilmCount;
+    showingFilmCount += SHOWING_FILM_COUNT_BY_BUTTON;
+
+    renderFilmCollection(mainFilmList, films.slice(prevFilmCount, showingFilmCount));
+
+    if (showingFilmCount >= films.length) {
+      removeComponent(showMoreButtonComponent);
+    }
+  });
+  // Отображаем кнопку по необходимости
+  if (showingFilmCount < films.length) {
+    render(mainFilmList.getElement(), showMoreButtonComponent.getElement());
   }
+
+  // Top rated фильмы
+  const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
+  const topRatedFilmList = new FilmListComponent(`Top rated`, true);
+  render(filmsComponent.getElement(), topRatedFilmList.getElement());
+  renderFilmCollection(topRatedFilmList, topRatedFilms);
+
+  // Most commented фильмы
+  const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
+  const mostCommentedFilmList = new FilmListComponent(`Most commented`, true);
+  render(filmsComponent.getElement(), mostCommentedFilmList.getElement());
+  renderFilmCollection(mostCommentedFilmList, mostCommentedFilms);
 };
 
 const films = generateFilms(FILM_COUNT);
 const filters = generateFilters(films);
 const profile = generateProfile(filters.history);
 
-// Шапка сайта с профилем (званием) пользователя
 const siteHeaderElement = document.querySelector(`.header`);
-render(siteHeaderElement, createProfileTemplate(profile));
+const siteMainElement = document.querySelector(`.main`);
+const siteFooterElement = document.querySelector(`.footer`);
+
+// Popup должен быть только один
+let visibleFilmDetailsComponent;
+
+// Профиль (звание) пользователя в шапке сайта
+render(siteHeaderElement, new ProfileComponent(profile).getElement());
 
 // Меню сайта
-const siteMainElement = document.querySelector(`.main`);
-render(siteMainElement, createMenuTemplate(filters));
+render(siteMainElement, new MenuComponent(filters).getElement());
+
+// Сортировка
+render(siteMainElement, new SortComponent().getElement());
 
 // Основной контент: списки фильмов
-render(siteMainElement, createContentTemplate());
-const mainContentElement = siteMainElement.querySelector(`.films`);
+renderFilms();
 
-// Filtered films
-let showingFilmCount = SHOWING_FILM_COUNT_ON_START;
-const filmListContainerElement = renderFilmList(mainContentElement, createFilmListTemplate(`All movies. Upcoming`, true, false));
-renderFilmCards(filmListContainerElement, films.slice(0, showingFilmCount));
-
-let extraFilmListContainerElement;
-
-// Top rated films
-const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
-extraFilmListContainerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Top rated`, false, true));
-renderFilmCards(extraFilmListContainerElement, topRatedFilms);
-
-// Most commented films
-const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
-extraFilmListContainerElement = renderFilmList(mainContentElement, createFilmListTemplate(`Most commented`, false, true));
-renderFilmCards(extraFilmListContainerElement, mostCommentedFilms);
-
-// Добавление кнопки "Show more" после списка отфильтрованных фильмов
-const filmListElement = mainContentElement.querySelector(`.films-list`);
-
-if (showingFilmCount < films.length) {
-  render(filmListElement, createShowMoreButtonTemplate());
-  const showMoreButton = filmListElement.querySelector(`.films-list__show-more`);
-  showMoreButton.addEventListener(`click`, showMoreButtonClickHandler);
-}
-
-// Статистика в подвале
-const siteFooterElement = document.querySelector(`.footer`);
-render(siteFooterElement, createFooterStatisticsTemplate(filters.all));
-
-// Дополнительная информация о фильме
-// Чтобы popup не закрывал весь контент, по умолчанию он скрытый
-render(siteFooterElement, createFilmDetailsTemplate(films[0], true), `afterend`);
+// Статистика в подвале сайта
+const siteFooterStatsElement = siteFooterElement.querySelector(`.footer__statistics`);
+render(siteFooterStatsElement, new FooterStatsComponent(filters.all).getElement());

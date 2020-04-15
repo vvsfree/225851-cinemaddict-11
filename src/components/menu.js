@@ -1,5 +1,7 @@
-export const createMenuTemplate = (filter) => {
-  const {watchlist, history, favorites} = filter;
+import {createElement} from "../utils.js";
+
+const createMenuTemplate = (filters) => {
+  const {watchlist, history, favorites} = filters;
   return (
     `<nav class="main-navigation">
       <div class="main-navigation__items">
@@ -12,3 +14,26 @@ export const createMenuTemplate = (filter) => {
     </nav>`
   );
 };
+
+export default class Menu {
+  constructor(filters) {
+    this._filters = filters;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createMenuTemplate(this._filters);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}

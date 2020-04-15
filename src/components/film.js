@@ -1,3 +1,5 @@
+import {createElement} from "../utils.js";
+
 const createButtonMarkup = (text, modifier, isActive) => {
   const className = `film-card__controls-item`;
   const classNameActive = isActive ? `${className}--active` : ``;
@@ -6,7 +8,7 @@ const createButtonMarkup = (text, modifier, isActive) => {
   );
 };
 
-export const createFilmTemplate = (film) => {
+const createFilmTemplate = (film) => {
   const {title, rating, year, runtime, genres, poster, summary, comments, userInfo: {isWaiting, isWatched, isFavorite}} = film;
 
   return (
@@ -29,3 +31,26 @@ export const createFilmTemplate = (film) => {
     </article>`
   );
 };
+
+export default class Film {
+  constructor(film) {
+    this._film = film;
+    this._element = null;
+  }
+
+  getTemplate() {
+    return createFilmTemplate(this._film);
+  }
+
+  getElement() {
+    if (!this._element) {
+      this._element = createElement(this.getTemplate());
+    }
+
+    return this._element;
+  }
+
+  removeElement() {
+    this._element = null;
+  }
+}
