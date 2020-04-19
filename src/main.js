@@ -2,8 +2,6 @@
 import ProfileComponent from "./components/profile.js";
 // Меню (фильтры и статистика)
 import MenuComponent from "./components/menu.js";
-// Сортировка
-import SortComponent from "./components/sort.js";
 // Секция фильмов (основной контент)
 import FilmsComponent from "./components/films.js";
 // Количество фильмов
@@ -21,7 +19,7 @@ import {generateFilters} from "./mock/filter.js";
 import {render} from "./utils/render.js";
 
 // Количество отображаемых фильмов
-const FILM_COUNT = 14;
+const FILM_COUNT = 11;
 
 const films = generateFilms(FILM_COUNT);
 const filters = generateFilters(films);
@@ -36,9 +34,6 @@ render(siteHeaderElement, new ProfileComponent(profile));
 
 // Меню сайта
 render(siteMainElement, new MenuComponent(filters));
-
-// Сортировка
-render(siteMainElement, new SortComponent());
 
 // Основной контент: списки фильмов
 const filmsComponent = new FilmsComponent();
