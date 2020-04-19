@@ -18,7 +18,7 @@ export default class FilmList extends AbstractComponent {
     super();
 
     this._config = config;
-    this._containerComponent = null;
+    this._containerComponent = new ContainerComponent();
   }
 
   getTemplate() {
@@ -26,8 +26,7 @@ export default class FilmList extends AbstractComponent {
   }
 
   getContainerComponent() {
-    if (!this._containerComponent) {
-      this._containerComponent = new ContainerComponent();
+    if (!this._containerComponent.isElementExists()) {
       this.getElement().append(this._containerComponent.getElement());
     }
 
