@@ -1,4 +1,4 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
 
 const createButtonMarkup = (text, modifier, isActive) => {
   const className = `film-card__controls-item`;
@@ -32,25 +32,22 @@ const createFilmTemplate = (film) => {
   );
 };
 
-export default class Film {
+export default class Film extends AbstractComponent {
   constructor(film) {
+    super();
+
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
+  setClickHandler(handler) {
+    const targetClasses = [`poster`, `title`, `comments`].map((it) => `.film-card__${it}`).join(`,`);
 
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+    this.getElement().querySelectorAll(targetClasses).forEach((target) => {
+      target.addEventListener(`click`, handler);
+    });
   }
 }

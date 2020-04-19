@@ -1,5 +1,5 @@
-import {createElement} from "../utils.js";
-import {getEmojis} from "../mock/emoji.js";
+import AbstractComponent from "./abstract-component.js";
+import {EMOJIS} from "../utils/const.js";
 
 const createEmojiMarkup = (emoji) => {
   return (
@@ -148,27 +148,21 @@ const createFilmDetailsTemplate = (film) => {
 };
 
 // Emojis не динамические данные, достаточно запустить один раз во время создания модуля
-const emojisMarkup = getEmojis().map(createEmojiMarkup).join(`\n`);
+const emojisMarkup = EMOJIS.map(createEmojiMarkup).join(`\n`);
 
-export default class Profile {
+export default class FilmDetails extends AbstractComponent {
   constructor(film) {
+    super();
+
     this._film = film;
-    this._element = null;
   }
 
   getTemplate() {
     return createFilmDetailsTemplate(this._film);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
-    }
-
-    return this._element;
-  }
-
-  removeElement() {
-    this._element = null;
+  setCloseBtnClickHandler(handler) {
+    const filmDetailsCloseBtn = this.getElement().querySelector(`.film-details__close-btn`);
+    filmDetailsCloseBtn.addEventListener(`click`, handler);
   }
 }

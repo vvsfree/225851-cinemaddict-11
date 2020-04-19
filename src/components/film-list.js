@@ -1,4 +1,5 @@
-import {createElement} from "../utils.js";
+import AbstractComponent from "./abstract-component.js";
+import ContainerComponent from "./container.js";
 
 const createFilmListTemplate = (config) => {
   const {title, isTitleHidden = false, hasExtraModifier = false} = config;
@@ -12,35 +13,24 @@ const createFilmListTemplate = (config) => {
   );
 };
 
-export default class FilmList {
+export default class FilmList extends AbstractComponent {
   constructor(config) {
+    super();
+
     this._config = config;
-    this._element = null;
-    this._innerContainerElement = null;
+    this._containerComponent = null;
   }
 
   getTemplate() {
     return createFilmListTemplate(this._config);
   }
 
-  getElement() {
-    if (!this._element) {
-      this._element = createElement(this.getTemplate());
+  getContainerComponent() {
+    if (!this._containerComponent) {
+      this._containerComponent = new ContainerComponent();
+      this.getElement().append(this._containerComponent.getElement());
     }
 
-    return this._element;
-  }
-
-  getContainerElement() {
-    if (!this._innerContainerElement) {
-      this._innerContainerElement = createElement(`<div class="films-list__container"></div>`);
-      this.getElement().append(this._innerContainerElement);
-    }
-
-    return this._innerContainerElement;
-  }
-
-  removeElement() {
-    this._element = null;
+    return this._containerComponent;
   }
 }
