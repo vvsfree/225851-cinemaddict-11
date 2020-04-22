@@ -144,7 +144,7 @@ export default class PageController {
     });
   }
 
-  _onDataChange(filmController, oldData, newData) {
+  _onDataChange(oldData, newData) {
     const index = this._films.findIndex((it) => it === oldData);
 
     if (index === -1) {
@@ -153,13 +153,22 @@ export default class PageController {
 
     this._films = [].concat(this._films.slice(0, index), newData, this._films.slice(index + 1));
 
-    filmController.render(this._films[index]);
+    [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
+    .forEach((controllerGroup) => {
+      controllerGroup.forEach((controller) => {
+        const film = controller.filmComponent.film;
+        if (film === oldData) {
+          controller.render(this._films[index]);
+        }
+      });
+    });
   }
 
   _onViewChange() {
-    this._showedFilmControllers.forEach((it) => it.setDefaultView());
-    this._topRatedFilmControllers.forEach((it) => it.setDefaultView());
-    this._mostCommentedFilmControllers.forEach((it) => it.setDefaultView());
+    [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
+      .forEach((controllerGroup) => {
+        controllerGroup.forEach((controller) => controller.setDefaultView());
+      });
   }
 
   _onSortTypeChange(sortType) {

@@ -25,6 +25,10 @@ export default class FilmController {
     this._onEscKeyDown = this._onEscKeyDown.bind(this);
   }
 
+  get filmComponent() {
+    return this._filmComponent;
+  }
+
   render(film) {
     const oldFilmComponent = this._filmComponent;
     const oldFilmDetailsComponent = this._filmDetailsComponent;
@@ -77,13 +81,15 @@ export default class FilmController {
   _getButtonHandler(film, flag) {
     return (evt) => {
       evt.preventDefault();
-      this._onDataChange(this, film, this._copyDataObject(film, flag, !film.userInfo[flag]));
+      this._onDataChange(film, this._copyDataObject(film, flag, !film.userInfo[flag]));
     };
   }
 
   _getInputHandler(film, flag) {
     return (evt) => {
-      this._onDataChange(this, film, this._copyDataObject(film, flag, evt.target.checked));
+      // this._onDataChange(film, this._copyDataObject(film, flag, evt.target.checked));
+      evt.preventDefault();
+      this._onDataChange(film, this._copyDataObject(film, flag, !film.userInfo[flag]));
     };
   }
 

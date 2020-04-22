@@ -198,17 +198,17 @@ export default class FilmDetails extends AbstractSmartComponent {
   }
 
   setWatchlistInputChangeHandler(handler) {
-    this.getElement().querySelector(`#watchlist`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`#watchlist`).addEventListener(`change`, handler);
     this._watchlistInputChangeHandler = handler;
   }
 
   setWatchedInputChangeHandler(handler) {
-    this.getElement().querySelector(`#watched`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`#watched`).addEventListener(`change`, handler);
     this._watchedInputChangeHandler = handler;
   }
 
   setFavoriteInputChangeHandler(handler) {
-    this.getElement().querySelector(`#favorite`).addEventListener(`click`, handler);
+    this.getElement().querySelector(`#favorite`).addEventListener(`change`, handler);
     this._favoriteInputChangeHandler = handler;
   }
 

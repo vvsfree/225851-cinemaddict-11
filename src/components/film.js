@@ -40,6 +40,10 @@ export default class Film extends AbstractComponent {
     this._film = film;
   }
 
+  get film() {
+    return this._film;
+  }
+
   getTemplate() {
     return createFilmTemplate(this._film);
   }
