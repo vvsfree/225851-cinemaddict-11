@@ -1,10 +1,11 @@
 import AbstractComponent from "./abstract-component.js";
 
+const CONTROLS_CLASS_NAME = `film-card__controls-item`;
+
 const createButtonMarkup = (text, modifier, isActive) => {
-  const className = `film-card__controls-item`;
-  const classNameActive = isActive ? `${className}--active` : ``;
+  const classNameActive = isActive ? `${CONTROLS_CLASS_NAME}--active` : ``;
   return (
-    `<button class="${className} button ${className}--${modifier} ${classNameActive}">${text}</button>`
+    `<button class="${CONTROLS_CLASS_NAME} button ${CONTROLS_CLASS_NAME}--${modifier} ${classNameActive}">${text}</button>`
   );
 };
 
@@ -49,5 +50,20 @@ export default class Film extends AbstractComponent {
     this.getElement().querySelectorAll(targetClasses).forEach((target) => {
       target.addEventListener(`click`, handler);
     });
+  }
+
+  setWatchlistButtonClickHandler(handler) {
+    this.getElement().querySelector(`.${CONTROLS_CLASS_NAME}--add-to-watchlist`)
+      .addEventListener(`click`, handler);
+  }
+
+  setWatchedButtonClickHandler(handler) {
+    this.getElement().querySelector(`.${CONTROLS_CLASS_NAME}--mark-as-watched`)
+      .addEventListener(`click`, handler);
+  }
+
+  setFavoriteButtonClickHandler(handler) {
+    this.getElement().querySelector(`.${CONTROLS_CLASS_NAME}--favorite`)
+      .addEventListener(`click`, handler);
   }
 }
