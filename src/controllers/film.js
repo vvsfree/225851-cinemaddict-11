@@ -87,9 +87,7 @@ export default class FilmController {
 
   _getInputHandler(film, flag) {
     return (evt) => {
-      // this._onDataChange(film, this._copyDataObject(film, flag, evt.target.checked));
-      evt.preventDefault();
-      this._onDataChange(film, this._copyDataObject(film, flag, !film.userInfo[flag]));
+      this._onDataChange(film, this._copyDataObject(film, flag, evt.target.checked));
     };
   }
 
