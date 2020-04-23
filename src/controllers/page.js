@@ -33,7 +33,7 @@ const getSortedFilms = (films, sortType) => {
 
   switch (sortType) {
     case SortType.DATE:
-      comparator = (a, b) => b.date - a.date;
+      comparator = (a, b) => b.releaseDate - a.releaseDate;
       break;
     case SortType.RATING:
       comparator = (a, b) => Number(b.rating) - Number(a.rating);
