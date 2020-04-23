@@ -26,7 +26,7 @@ export default class FilmList extends AbstractComponent {
   }
 
   getContainerComponent() {
-    if (!this._containerComponent.isElementExists()) {
+    if (!this._containerComponent.isElementCreated()) {
       this.getElement().append(this._containerComponent.getElement());
     }
 

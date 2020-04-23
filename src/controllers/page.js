@@ -115,7 +115,7 @@ export default class PageController {
   _renderLoadMoreButton(source) {
     // Если отрисовывается кнопка, которая уже есть на странице, то она не продублируется, но добавится еще один обработчик
     // Поэтому удаляем ее полностью (не только из DOM, но и сам элемент, к которому привязывается обработчик)
-    if (this._showMoreButtonComponent.isElementExists()) {
+    if (this._showMoreButtonComponent.isElementCreated()) {
       remove(this._showMoreButtonComponent);
     }
 

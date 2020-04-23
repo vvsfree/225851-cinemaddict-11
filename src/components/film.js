@@ -3,7 +3,7 @@ import {getYear, getDuration} from "../utils/common.js";
 
 const CONTROLS_CLASS_NAME = `film-card__controls-item`;
 
-const createButtonMarkup = (text, modifier, isActive) => {
+const createButtonControlMarkup = (text, modifier, isActive) => {
   const classNameActive = isActive ? `${CONTROLS_CLASS_NAME}--active` : ``;
   return (
     `<button class="${CONTROLS_CLASS_NAME} button ${CONTROLS_CLASS_NAME}--${modifier} ${classNameActive}">${text}</button>`
@@ -26,9 +26,9 @@ const createFilmTemplate = (film) => {
       <p class="film-card__description">${summary}</p>
       <a class="film-card__comments">${comments.length} comments</a>
       <form class="film-card__controls">
-        ${createButtonMarkup(`Add to watchlist`, `add-to-watchlist`, isWaiting)}
-        ${createButtonMarkup(`Mark as watched`, `mark-as-watched`, isWatched)}
-        ${createButtonMarkup(`Mark as favorite`, `favorite`, isFavorite)}
+        ${createButtonControlMarkup(`Add to watchlist`, `add-to-watchlist`, isWaiting)}
+        ${createButtonControlMarkup(`Mark as watched`, `mark-as-watched`, isWatched)}
+        ${createButtonControlMarkup(`Mark as favorite`, `favorite`, isFavorite)}
       </form>
     </article>`
   );

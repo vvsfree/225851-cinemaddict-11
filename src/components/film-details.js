@@ -42,7 +42,7 @@ const createCommentMarkup = (comment) => {
   );
 };
 
-const createButtonMarkup = (text, name, isActive) => {
+const createCheckboxControlMarkup = (text, name, isActive) => {
   const isChecked = isActive ? `checked` : ``;
   return (
     `<input type="checkbox" class="film-details__control-input visually-hidden" id="${name}" name="${name}" ${isChecked}>
@@ -131,9 +131,9 @@ const createFilmDetailsTemplate = (film, chosenEmoji) => {
           </div>
 
           <section class="film-details__controls">
-            ${createButtonMarkup(`Add to watchlist`, `watchlist`, isWaiting)}
-            ${createButtonMarkup(`Mark as watched`, `watched`, isWatched)}
-            ${createButtonMarkup(`Mark as favorite`, `favorite`, isFavorite)}
+            ${createCheckboxControlMarkup(`Add to watchlist`, `watchlist`, isWaiting)}
+            ${createCheckboxControlMarkup(`Mark as watched`, `watched`, isWatched)}
+            ${createCheckboxControlMarkup(`Mark as favorite`, `favorite`, isFavorite)}
           </section>
         </div>
 
