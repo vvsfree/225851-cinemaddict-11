@@ -13,7 +13,7 @@ export default class AbstractComponent {
     throw new Error(`Abstract method not implemented: getTemplate`);
   }
 
-  isElementExists() {
+  isElementCreated() {
     return !!this._element;
   }
 

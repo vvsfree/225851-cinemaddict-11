@@ -33,7 +33,7 @@ const getSortedFilms = (films, sortType) => {
 
   switch (sortType) {
     case SortType.DATE:
-      comparator = (a, b) => b.date - a.date;
+      comparator = (a, b) => b.releaseDate - a.releaseDate;
       break;
     case SortType.RATING:
       comparator = (a, b) => Number(b.rating) - Number(a.rating);
@@ -115,7 +115,7 @@ export default class PageController {
   _renderLoadMoreButton(source) {
     // Если отрисовывается кнопка, которая уже есть на странице, то она не продублируется, но добавится еще один обработчик
     // Поэтому удаляем ее полностью (не только из DOM, но и сам элемент, к которому привязывается обработчик)
-    if (this._showMoreButtonComponent.isElementExists()) {
+    if (this._showMoreButtonComponent.isElementCreated()) {
       remove(this._showMoreButtonComponent);
     }
 

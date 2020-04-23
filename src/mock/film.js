@@ -77,9 +77,9 @@ const generateFilm = () => {
   // Актёрский состав
   const actors = [`Erich von Stroheim`, `Mary Beth Hughes`, `Dan Duryea`];
   // Дата создания фильма
-  const date = getRandomDate();
+  const releaseDate = getRandomDate();
   // Продолжительность в формате часы минуты (например «1h 36m»)
-  const runtime = `1h 18m`;
+  const runtime = getRandomInteger(30, 3 * 60);
   // Страна
   const country = `USA`;
   // Жанр(ы)
@@ -106,17 +106,7 @@ const generateFilm = () => {
     director,
     writers,
     actors,
-    date,
-    // Год производства
-    get year() {
-      return date.getFullYear();
-    },
-    // Дата и год релиза в формате день месяц год (например: «01 April 1995»)
-    get releaseDate() {
-      const locale = `en-US`;
-      const options = {month: `long`, year: `numeric`};
-      return `${date.toLocaleDateString(locale, {day: `2-digit`})} ${date.toLocaleDateString(locale, options)}`;
-    },
+    releaseDate,
     runtime,
     country,
     genres,

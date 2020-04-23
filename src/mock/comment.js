@@ -3,32 +3,32 @@ const SAMPLE_COMMENTS = [
     emoji: `smile`,
     text: `Interesting setting and a good cast`,
     author: `Tim Macoveev`,
-    day: `2019/12/31 23:59`
+    day: `2020-04-23T13:53:00`
   }, {
     emoji: `sleeping`,
     text: `Booooooooooring`,
     author: `John Doe`,
-    day: `2 days ago`
+    day: `2020-04-22T22:10:00`
   }, {
     emoji: `puke`,
     text: `Very very old. Meh`,
     author: `John Doe`,
-    day: `2 days ago`
+    day: `2020-03-31T11:15:00`
   }, {
     emoji: `angry`,
     text: `Almost two hours? Seriously?`,
     author: `Milla Jovovich`,
-    day: `Today`
+    day: `2020-02-15T14:44:00`
   }, {
     emoji: `smile`,
     text: `First here! ))`,
     author: `Bro`,
-    day: `Today`
+    day: `2019-01-31T20:20`
   }, {
     emoji: `sleeping`,
     text: `I'm a dog tired watching this "masterpiece" ... h-r-r`,
     author: `Film expert`,
-    day: `some days ago`
+    day: `2019-12-31T11:50:00`
   }
 ];
 
