@@ -1,5 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {EMOJIS} from "../utils/const.js";
+import {formatDate, formatCommentDateAsHuman, getDuration} from "../utils/common.js";
 
 const createEmojiImgMarkup = (emoji, size = 30) => {
   return emoji ? `<img src="./images/emoji/${emoji}.png" width="${size}" height="${size}" alt="emoji-${emoji}">` : ``;
@@ -33,7 +34,7 @@ const createCommentMarkup = (comment) => {
         <p class="film-details__comment-text">${text}</p>
         <p class="film-details__comment-info">
           <span class="film-details__comment-author">${author}</span>
-          <span class="film-details__comment-day">${day}</span>
+          <span class="film-details__comment-day">${formatCommentDateAsHuman(day)}</span>
           <button class="film-details__comment-delete">Delete</button>
         </p>
       </div>
@@ -117,8 +118,8 @@ const createFilmDetailsTemplate = (film, chosenEmoji) => {
                 ${generateDetailsTableRow(`Director`, director)}
                 ${generateDetailsTableRow(`Writers`, writers.join(`, `))}
                 ${generateDetailsTableRow(`Actors`, actors.join(`, `))}
-                ${generateDetailsTableRow(`Release Date`, releaseDate)}
-                ${generateDetailsTableRow(`Runtime`, runtime)}
+                ${generateDetailsTableRow(`Release Date`, formatDate(releaseDate))}
+                ${generateDetailsTableRow(`Runtime`, getDuration(runtime))}
                 ${generateDetailsTableRow(`Country`, country)}
                 ${generateDetailsTableRow(`Genre${genres.length > 1 ? `s` : ``}`, genresMarkup)}
               </table>
