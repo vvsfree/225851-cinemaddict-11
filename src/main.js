@@ -1,13 +1,12 @@
 // Звание пользователя
 import ProfileComponent from "./components/profile.js";
-// Меню (фильтры и статистика)
-import MenuComponent from "./components/menu.js";
 // Секция фильмов (основной контент)
 import FilmsComponent from "./components/films.js";
 // Количество фильмов
 import FooterStatsComponent from "./components/footer-stats.js";
 
-// Page Controller
+// Контроллеры
+import FilterController from "./controllers/filter.js";
 import PageController from "./controllers/page.js";
 
 // Модели
@@ -37,8 +36,9 @@ const siteFooterElement = document.querySelector(`.footer`);
 // Профиль (звание) пользователя в шапке сайта
 render(siteHeaderElement, new ProfileComponent(profile));
 
-// Меню сайта
-render(siteMainElement, new MenuComponent(filters));
+// Меню сайта (которое есть фильтр)
+const filterController = new FilterController(siteMainElement, filmsModel);
+filterController.render();
 
 // Основной контент: списки фильмов
 const filmsComponent = new FilmsComponent();

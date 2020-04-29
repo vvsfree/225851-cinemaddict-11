@@ -1,5 +1,5 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
-import {EMOJIS} from "../utils/const.js";
+import {EMOJIS} from "../const.js";
 import {formatDate, formatCommentDateAsHuman, getDuration} from "../utils/common.js";
 
 const createEmojiImgMarkup = (emoji, size = 30) => {

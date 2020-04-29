@@ -4,7 +4,9 @@ import {render, remove, RenderPosition} from "../utils/render.js";
 import FilmController from "./film.js";
 
 // Сортировка
-import SortComponent, {SortType} from "../components/sort.js";
+import SortComponent from "../components/sort.js";
+import {SortType} from "../const.js";
+
 // Секция со списками фильмов. Содержит заголовок и контейнер списка
 import FilmListComponent from "../components/film-list.js";
 // Кнопка «Show more»
@@ -71,7 +73,10 @@ export default class PageController {
     this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
+    this._onFilterChange = this._onFilterChange.bind(this);
+
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._filmsModel.setFilterChangeHandler(this._onFilterChange);
   }
 
   render() {
@@ -88,15 +93,7 @@ export default class PageController {
 
     // Все фильмы (отфильтрованные фильмы)
     render(this._container.getElement(), this._mainFilmList);
-
-    const newFilmControllers = renderFilmCollection(
-        this._mainFilmList,
-        films.slice(0, this._showingFilmCount),
-        this._onDataChange,
-        this._onViewChange
-    );
-    this._showedFilmControllers = this._showedFilmControllers.concat(newFilmControllers);
-
+    this._renderFilms(films.slice(0, this._showingFilmCount));
     this._renderLoadMoreButton(films);
 
     // Top rated фильмы
@@ -129,18 +126,31 @@ export default class PageController {
       const prevFilmCount = this._showingFilmCount;
       this._showingFilmCount += SHOWING_FILM_COUNT_BY_BUTTON;
 
-      const newFilmControllers = renderFilmCollection(
-          this._mainFilmList,
-          source.slice(prevFilmCount, this._showingFilmCount),
-          this._onDataChange,
-          this._onViewChange
-      );
-      this._showedFilmControllers = this._showedFilmControllers.concat(newFilmControllers);
+      this._renderFilms(source.slice(prevFilmCount, this._showingFilmCount));
 
       if (this._showingFilmCount >= source.length) {
         remove(this._showMoreButtonComponent);
       }
     });
+  }
+
+  _removeFilms() {
+    this._showedFilmControllers.forEach((controller) => controller.destroy());
+    this._showedFilmControllers = [];
+  }
+
+  _renderFilms(films) {
+    const newFilmControllers = renderFilmCollection(this._mainFilmList, films, this._onDataChange, this._onViewChange);
+    this._showedFilmControllers = this._showedFilmControllers.concat(newFilmControllers);
+
+    this._showingFilmCount = this._showedFilmControllers.length;
+  }
+
+  _updateFilms(count) {
+    this._removeFilms();
+    const films = this._filmsModel.getFilms();
+    this._renderFilms(films.slice(0, count));
+    this._renderLoadMoreButton(films);
   }
 
   _onDataChange(oldData, newData) {
@@ -167,15 +177,15 @@ export default class PageController {
 
   _onSortTypeChange(sortType) {
     // Очищаем контейнер фильмов в списке фильмов
-    remove(this._mainFilmList.getContainerComponent());
+    this._removeFilms();
     const sortedFilms = getSortedFilms(this._filmsModel.getFilms(), sortType);
     this._showingFilmCount = SHOWING_FILM_COUNT_ON_START;
-    this._showedFilmControllers = renderFilmCollection(
-        this._mainFilmList,
-        sortedFilms.slice(0, this._showingFilmCount),
-        this._onDataChange,
-        this._onViewChange
-    );
+    this._renderFilms(sortedFilms.slice(0, this._showingFilmCount));
     this._renderLoadMoreButton(sortedFilms);
+  }
+
+  _onFilterChange() {
+    this._sortComponent.setSortType(SortType.DEFAULT);
+    this._updateFilms(SHOWING_FILM_COUNT_ON_START);
   }
 }

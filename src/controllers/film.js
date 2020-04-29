@@ -1,5 +1,5 @@
 // Отрисовка элементов
-import {render, replace} from "../utils/render.js";
+import {render, remove, replace} from "../utils/render.js";
 
 // Карточка фильма
 import FilmComponent from "../components/film.js";
@@ -70,6 +70,12 @@ export default class FilmController {
     if (this._mode !== Mode.DEFAULT) {
       this._removeFilmDetails();
     }
+  }
+
+  destroy() {
+    remove(this._filmDetailsComponent);
+    remove(this._filmComponent);
+    document.removeEventListener(`keydown`, this._onEscKeyDown);
   }
 
   _removeFilmDetails() {

@@ -1,7 +1,10 @@
+import {getFilmsByFilter} from "../utils/filter.js";
+import {FilterType} from "../const.js";
+
 export default class Films {
   constructor() {
     this._films = [];
-    // this._activeFilterType = FilterType.ALL;
+    this._activeFilterType = FilterType.ALL;
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
@@ -12,9 +15,13 @@ export default class Films {
     this._callHandlers(this._dataChangeHandlers);
   }
 
+  setFilter(filterType) {
+    this._activeFilterType = filterType;
+    this._callHandlers(this._filterChangeHandlers);
+  }
+
   getFilms() {
-    return this._films;
-    // return getFilmsByFilter(this._films, this._activeFilterType);
+    return getFilmsByFilter(this._films, this._activeFilterType);
   }
 
   getFilmsAll() {
@@ -33,6 +40,10 @@ export default class Films {
     this._callHandlers(this._dataChangeHandlers);
 
     return true;
+  }
+
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
   }
 
   setDataChangeHandler(handler) {
