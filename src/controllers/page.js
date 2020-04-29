@@ -51,10 +51,9 @@ const getSortedFilms = (films, sortType) => {
 
 
 export default class PageController {
-  constructor(container) {
+  constructor(container, filmsModel) {
     this._container = container;
-
-    this._films = [];
+    this._filmsModel = filmsModel;
 
     this._showedFilmControllers = [];
     this._topRatedFilmControllers = [];
@@ -75,8 +74,8 @@ export default class PageController {
     this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
   }
 
-  render(films) {
-    this._films = films;
+  render() {
+    const films = this._filmsModel.getFilms();
 
     // Сортировка
     render(this._container.getElement(), this._sortComponent, RenderPosition.BEFORE);
@@ -145,23 +144,18 @@ export default class PageController {
   }
 
   _onDataChange(oldData, newData) {
-    const index = this._films.findIndex((it) => it === oldData);
-
-    if (index === -1) {
-      return;
-    }
-
-    this._films = [].concat(this._films.slice(0, index), newData, this._films.slice(index + 1));
-
-    [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
-    .forEach((controllerGroup) => {
-      controllerGroup.forEach((controller) => {
-        const film = controller.filmComponent.film;
-        if (film === oldData) {
-          controller.render(this._films[index]);
-        }
+    const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
+    if (isSuccess) {
+      [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
+      .forEach((controllerGroup) => {
+        controllerGroup.forEach((controller) => {
+          const film = controller.filmComponent.film;
+          if (film === oldData) {
+            controller.render(newData);
+          }
+        });
       });
-    });
+    }
   }
 
   _onViewChange() {
@@ -174,7 +168,7 @@ export default class PageController {
   _onSortTypeChange(sortType) {
     // Очищаем контейнер фильмов в списке фильмов
     remove(this._mainFilmList.getContainerComponent());
-    const sortedFilms = getSortedFilms(this._films, sortType);
+    const sortedFilms = getSortedFilms(this._filmsModel.getFilms(), sortType);
     this._showingFilmCount = SHOWING_FILM_COUNT_ON_START;
     this._showedFilmControllers = renderFilmCollection(
         this._mainFilmList,

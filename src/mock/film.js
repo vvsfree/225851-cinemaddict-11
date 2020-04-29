@@ -57,6 +57,7 @@ const generateDescription = (count) => {
 let sampleFilmsIdx = 0;
 
 const generateFilm = () => {
+  const id = String(new Date() + Math.random());
   const sampleFilm = SAMPLE_FILMS[sampleFilmsIdx++ % SAMPLE_FILMS.length];
   // Постер (картинка)
   const poster = sampleFilm.poster;
@@ -97,6 +98,7 @@ const generateFilm = () => {
   };
 
   return {
+    id,
     title,
     originalTitle,
     poster,
