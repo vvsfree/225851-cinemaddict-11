@@ -1,36 +1,48 @@
-import AbstractComponent from "./abstract-component.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
+import {SortType, SortTypes} from "../const.js";
 
-const ACTIVE_CLASS = `sort__button--active`;
+const CLASS_NAME = `sort__button`;
+const ACTIVE_CLASS = `${CLASS_NAME}--active`;
 
-export const SortType = {
-  DEFAULT: `default`,
-  DATE: `date`,
-  RATING: `rating`,
+const createSortMarkup = (sortType, activeSortType) => {
+  const active = sortType === activeSortType ? ACTIVE_CLASS : ``;
+  return (
+    `<li><a href="#" data-sort-type="${sortType}" class="${CLASS_NAME} ${active}">Sort by ${sortType}</a></li>`
+  );
 };
 
-const createSortTemplate = () => {
+const createSortTemplate = (activeSortType) => {
+  const sortMarkup = SortTypes.map((it) => createSortMarkup(it, activeSortType)).join(`\n`);
   return (
     `<ul class="sort">
-      <li><a href="#" data-sort-type="${SortType.DEFAULT}" class="sort__button sort__button--active">Sort by default</a></li>
-      <li><a href="#" data-sort-type="${SortType.DATE}" class="sort__button">Sort by date</a></li>
-      <li><a href="#" data-sort-type="${SortType.RATING}" class="sort__button">Sort by rating</a></li>
+      ${sortMarkup}
     </ul>`
   );
 };
 
-export default class Sort extends AbstractComponent {
+export default class Sort extends AbstractSmartComponent {
   constructor() {
     super();
 
     this._currentSortType = SortType.DEFAULT;
+    this._setSortTypeChangeHandler = null;
   }
 
   getTemplate() {
-    return createSortTemplate();
+    return createSortTemplate(this._currentSortType);
+  }
+
+  recoveryListeners() {
+    this.setSortTypeChangeHandler(this._setSortTypeChangeHandler);
   }
 
   getSortType() {
     return this._currentSortType;
+  }
+
+  setSortType(sortType) {
+    this._currentSortType = sortType;
+    this.rerender();
   }
 
   setSortTypeChangeHandler(handler) {
@@ -49,11 +61,12 @@ export default class Sort extends AbstractComponent {
 
       this._currentSortType = sortType;
 
-      // Устанавливаем признак активной сортировки
-      this.getElement().querySelector(`.${ACTIVE_CLASS}`).classList.remove(ACTIVE_CLASS);
-      evt.target.classList.add(ACTIVE_CLASS);
+      // Признак активной сортировки установится автоматически
+      this.rerender();
 
       handler(this._currentSortType);
     });
+
+    this._setSortTypeChangeHandler = handler;
   }
 }
