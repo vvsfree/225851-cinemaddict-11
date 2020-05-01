@@ -1,8 +1,10 @@
 import AbstractComponent from "./abstract-component.js";
 import {formatCommentDateAsHuman} from "../utils/common.js";
+import {encode} from "he";
 
 const createCommentTemplate = (comment) => {
-  const {emoji, text, author, day} = comment;
+  const {emoji, text: notSanitizedText, author, day} = comment;
+  const text = encode(notSanitizedText);
   return (
     `<li class="film-details__comment">
       <span class="film-details__comment-emoji">
