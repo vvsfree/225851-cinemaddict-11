@@ -11,6 +11,7 @@ import PageController from "./controllers/page.js";
 
 // Модели
 import FilmsModel from "./models/films.js";
+import CommentsModel from "./models/comments.js";
 
 // Генерация объектов
 import {generateProfile} from "./mock/profile.js";
@@ -23,8 +24,12 @@ import {render} from "./utils/render.js";
 // Количество отображаемых фильмов
 const FILM_COUNT = 11;
 
+const films = generateFilms(FILM_COUNT);
 const filmsModel = new FilmsModel();
-filmsModel.setFilms(generateFilms(FILM_COUNT));
+filmsModel.setFilms(films);
+const commentsModel = new CommentsModel();
+commentsModel.setComments(films);
+const models = {filmsModel, commentsModel};
 
 const filters = generateFilters(filmsModel.getFilmsAll());
 const profile = generateProfile(filters.history);
@@ -44,7 +49,7 @@ filterController.render();
 const filmsComponent = new FilmsComponent();
 render(siteMainElement, filmsComponent);
 
-const pageController = new PageController(filmsComponent, filmsModel);
+const pageController = new PageController(filmsComponent, models);
 pageController.render();
 
 // Статистика в подвале сайта

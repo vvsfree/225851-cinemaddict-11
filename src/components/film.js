@@ -11,7 +11,7 @@ const createButtonControlMarkup = (text, modifier, isActive) => {
 };
 
 const createFilmTemplate = (film) => {
-  const {title, rating, releaseDate, runtime, genres, poster, summary, comments, userInfo: {isWaiting, isWatched, isFavorite}} = film;
+  const {title, rating, releaseDate, runtime, genres, poster, summary, commentsCount, userInfo: {isWaiting, isWatched, isFavorite}} = film;
 
   return (
     `<article class="film-card">
@@ -24,7 +24,7 @@ const createFilmTemplate = (film) => {
       </p>
       <img src="./images/posters/${poster}" alt="${title}" class="film-card__poster">
       <p class="film-card__description">${summary}</p>
-      <a class="film-card__comments">${comments.length} comments</a>
+      <a class="film-card__comments">${commentsCount} comments</a>
       <form class="film-card__controls">
         ${createButtonControlMarkup(`Add to watchlist`, `add-to-watchlist`, isWaiting)}
         ${createButtonControlMarkup(`Mark as watched`, `mark-as-watched`, isWatched)}

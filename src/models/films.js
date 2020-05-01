@@ -1,7 +1,7 @@
 import {getFilmsByFilter} from "../utils/filter.js";
 import {FilterType} from "../const.js";
 
-export default class Films {
+export default class FilmsModel {
   constructor() {
     this._films = [];
     this._activeFilterType = FilterType.ALL;
@@ -11,7 +11,12 @@ export default class Films {
   }
 
   setFilms(films) {
-    this._films = Array.from(films);
+    this._films = [];
+    films.forEach((film) => {
+      const _film = Object.assign({}, film, {commentsCount: film.comments.length});
+      delete _film.comments;
+      this._films.push(_film);
+    });
     this._callHandlers(this._dataChangeHandlers);
   }
 

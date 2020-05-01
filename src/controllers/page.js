@@ -22,14 +22,6 @@ const SHOWING_FILM_COUNT_BY_BUTTON = 5;
 // Количество фильмов в блоках «Top rated movies» и «Most commented»
 const EXTRA_FILM_COUNT = 2;
 
-const renderFilmCollection = (filmList, filmCollection, onDataChange, onViewChange) => {
-  return filmCollection.map((film) => {
-    const filmController = new FilmController(filmList, onDataChange, onViewChange);
-    filmController.render(film);
-    return filmController;
-  });
-};
-
 const getSortedFilms = (films, sortType) => {
   let comparator;
 
@@ -53,9 +45,10 @@ const getSortedFilms = (films, sortType) => {
 
 
 export default class PageController {
-  constructor(container, filmsModel) {
+  constructor(container, models) {
     this._container = container;
-    this._filmsModel = filmsModel;
+    this._filmsModel = models.filmsModel;
+    this._commentsModel = models.commentsModel;
 
     this._showedFilmControllers = [];
     this._topRatedFilmControllers = [];
@@ -99,12 +92,20 @@ export default class PageController {
     // Top rated фильмы
     const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
     render(this._container.getElement(), this._topRatedFilmList);
-    this._topRatedFilmControllers = renderFilmCollection(this._topRatedFilmList, topRatedFilms, this._onDataChange, this._onViewChange);
+    this._topRatedFilmControllers = this._renderFilmCollection(this._topRatedFilmList, topRatedFilms);
 
     // Most commented фильмы
     const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
     render(this._container.getElement(), this._mostCommentedFilmList);
-    this._mostCommentedFilmControllers = renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms, this._onDataChange, this._onViewChange);
+    this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms);
+  }
+
+  _renderFilmCollection(filmList, filmCollection) {
+    return filmCollection.map((film) => {
+      const filmController = new FilmController(filmList, this._commentsModel, this._onDataChange, this._onViewChange);
+      filmController.render(film);
+      return filmController;
+    });
   }
 
   // Добавление кнопки "Show more" после списка отфильтрованных фильмов
@@ -140,7 +141,7 @@ export default class PageController {
   }
 
   _renderFilms(films) {
-    const newFilmControllers = renderFilmCollection(this._mainFilmList, films, this._onDataChange, this._onViewChange);
+    const newFilmControllers = this._renderFilmCollection(this._mainFilmList, films);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilmControllers);
 
     this._showingFilmCount = this._showedFilmControllers.length;

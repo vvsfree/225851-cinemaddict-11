@@ -54,10 +54,14 @@ const generateDescription = (count) => {
   return new Array(count).fill(``).map(() => getRandomArrayItem(SAMPLE_PHRASES)).join();
 };
 
+const generateId = () => {
+  return Number(Date.now()) + Math.random();
+};
+
 let sampleFilmsIdx = 0;
 
 const generateFilm = () => {
-  const id = String(new Date() + Math.random());
+  const id = generateId();
   const sampleFilm = SAMPLE_FILMS[sampleFilmsIdx++ % SAMPLE_FILMS.length];
   // Постер (картинка)
   const poster = sampleFilm.poster;
@@ -89,7 +93,7 @@ const generateFilm = () => {
   const description = generateDescription(getRandomInteger(1, 5));
 
   // Комментарии от 0 до 5
-  const comments = generateComments(getRandomInteger(0, 5));
+  const comments = generateComments(getRandomInteger(0, 5)).map((comment) => Object.assign({}, comment, {id: generateId()}));
 
   const userInfo = {
     isWaiting: getRandomBoolean(),
@@ -128,4 +132,5 @@ const generateFilms = (count) => {
     .map(generateFilm);
 };
 
+export {generateId};
 export {generateFilms};
