@@ -1,3 +1,5 @@
+import {shuffle} from "../utils/common.js";
+
 const SAMPLE_COMMENTS = [
   {
     emoji: `smile`,
@@ -31,12 +33,6 @@ const SAMPLE_COMMENTS = [
     day: `2019-12-31T11:50:00`
   }
 ];
-
-const shuffle = (arr) => {
-  return arr.sort(() => {
-    return Math.random() - 0.5;
-  });
-};
 
 const generateComments = (count) => {
   return shuffle(SAMPLE_COMMENTS.slice()).slice(0, count);

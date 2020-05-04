@@ -14,7 +14,7 @@ import ShowMoreButtonComponent from "../components/show-more-button.js";
 
 // Данные по фильмам в категориях Top rated и Most commented
 // Предполагается, что эти данные будут запрашиваться с сервера
-import {getTopRatedFilms, getMostCommentedFilms} from "../mock/extra-film.js";
+import {getTopRatedFilms, getMostCommentedFilms} from "../models/extra-film.js";
 
 const SHOWING_FILM_COUNT_ON_START = 5;
 const SHOWING_FILM_COUNT_BY_BUTTON = 5;
@@ -68,8 +68,18 @@ export default class PageController {
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
 
-    this._sortComponent.setSortTypeChangeHandler(this._onSortTypeChange);
+    this._sortComponent.setSortTypeClickHandler(this._onSortTypeChange);
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
+  }
+
+  hide() {
+    this._container.hide();
+    this._sortComponent.hide();
+  }
+
+  show() {
+    this._container.show();
+    this._sortComponent.show();
   }
 
   render() {
@@ -98,6 +108,12 @@ export default class PageController {
     const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
     render(this._container.getElement(), this._mostCommentedFilmList);
     this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms);
+  }
+
+  resetSortType() {
+    if (this._sortComponent.setSortType(SortType.DEFAULT)) {
+      this._onSortTypeChange(SortType.DEFAULT);
+    }
   }
 
   _renderFilmCollection(filmList, filmCollection) {

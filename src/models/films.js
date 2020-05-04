@@ -1,5 +1,6 @@
 import {getFilmsByFilter} from "../utils/filter.js";
-import {FilterType} from "../const.js";
+import {Period, FilterType} from "../const.js";
+import {isOnePeriod} from "../utils/common.js";
 
 export default class FilmsModel {
   constructor() {
@@ -31,6 +32,49 @@ export default class FilmsModel {
 
   getFilmsAll() {
     return this._films;
+  }
+
+  getWatchedStatistics(period) {
+    let measure;
+    switch (period) {
+      case Period.TODAY:
+        measure = `days`;
+        break;
+      case Period.WEEK:
+        measure = `weeks`;
+        break;
+      case Period.MONTH:
+        measure = `months`;
+        break;
+      case Period.YEAR:
+        measure = `years`;
+        break;
+      default:
+        measure = null;
+        break;
+    }
+
+    const today = new Date();
+    const watchedFilms = this._films.filter((film) => {
+      return film.userInfo.isWatched && isOnePeriod(film.userInfo.watchingDate, today, measure);
+    });
+    const totalRuntime = watchedFilms.reduce((accumulator, film) => {
+      return accumulator + film.runtime;
+    }, 0);
+    const genres = watchedFilms.reduce((accumulator, film) => {
+      film.genres.forEach((genre) => {
+        if (!accumulator[genre]) {
+          accumulator[genre] = 0;
+        }
+        accumulator[genre]++;
+      });
+      return accumulator;
+    }, {});
+    let topGenre = ``;
+    if (watchedFilms.length > 0) {
+      topGenre = Object.entries(genres).sort((a, b) => a[0] - b[0])[0][0];
+    }
+    return {watchedCount: watchedFilms.length, totalRuntime, topGenre};
   }
 
   updateFilm(id, film) {
