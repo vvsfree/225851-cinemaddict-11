@@ -1,4 +1,5 @@
 import moment from "moment";
+import {Rating} from "../const";
 
 const OUTPUT_FORMAT = `DD MMMM YYYY`;
 const OUTPUT_FORMAT_HM = `YYYY/MM/DD HH:mm`;
@@ -47,4 +48,19 @@ export const shuffle = (arr) => {
 
 export const capitalize = (str) => {
   return str.charAt(0).toUpperCase() + str.slice(1);
+};
+
+export const getRating = (watchedCount) => {
+  let rating;
+  if (watchedCount === 0) {
+    rating = Rating.NONE;
+  } else if (watchedCount <= 10) {
+    rating = Rating.NOVICE;
+  } else if (watchedCount <= 20) {
+    rating = Rating.FAN;
+  } else {
+    rating = Rating.MOVIE_BUFF;
+  }
+
+  return rating;
 };

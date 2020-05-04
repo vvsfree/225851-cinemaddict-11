@@ -1,6 +1,7 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {getDuration, capitalize} from "../utils/common.js";
 import {Period, Periods} from "../const.js";
+import {getWatchedStatistics} from "../utils/statistics.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
 
@@ -88,7 +89,7 @@ const createPeriodMarkup = (period, currentPeriod) => {
   );
 };
 
-const createStatisticsTemplate = (statistics, currentPeriod) => {
+const createStatisticsTemplate = (statistics, currentPeriod, userRating) => {
   const {watchedCount, totalRuntime, genres} = statistics;
   const totalDuration = getDuration(totalRuntime);
   let topGenre = ``;
@@ -103,7 +104,7 @@ const createStatisticsTemplate = (statistics, currentPeriod) => {
       <p class="statistic__rank">
         Your rank
         <img class="statistic__img" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
-        <span class="statistic__rank-label">Sci-Fighter</span>
+        <span class="statistic__rank-label">${userRating}</span>
       </p>
 
       <form action="https://echo.htmlacademy.ru/" method="get" class="statistic__filters">
@@ -135,7 +136,7 @@ const createStatisticsTemplate = (statistics, currentPeriod) => {
 };
 
 export default class Statistics extends AbstractSmartComponent {
-  constructor(model) {
+  constructor(model, userRating) {
     super();
     this._model = model;
     this._currentPeriod = Period.ALL_TIME;
@@ -143,11 +144,14 @@ export default class Statistics extends AbstractSmartComponent {
     // По умолчанию статистика скрыта и при ее (скрытой) отрисовке не будет происходить обращение за стат. данными
     this._statistics = {watchedCount: 0, totalRuntime: 0, genres: []};
 
+    // Рейтинг рассчитывается при загрузке приложения один раз и передается в этот конструктор
+    this._userRating = userRating;
+
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._statistics, this._currentPeriod);
+    return createStatisticsTemplate(this._statistics, this._currentPeriod, this._userRating);
   }
 
   recoveryListeners() {
@@ -161,7 +165,7 @@ export default class Statistics extends AbstractSmartComponent {
 
   rerender() {
     // Обновляем статистические данные
-    this._statistics = this._model.getWatchedStatistics(this._currentPeriod);
+    this._statistics = getWatchedStatistics(this._model.getFilmsAll(), this._currentPeriod);
     // Отрисовываем свежие данные
     super.rerender();
     // Перерисовываем график

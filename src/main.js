@@ -18,13 +18,13 @@ import FilmsModel from "./models/films.js";
 import CommentsModel from "./models/comments.js";
 
 // Генерация объектов
-import {generateProfile} from "./mock/profile.js";
 import {generateFilms} from "./mock/film.js";
-import {generateFilters} from "./mock/filter.js";
 
 // Отрисовка элементов
 import {render} from "./utils/render.js";
-import {MenuItemType} from "./const.js";
+import {MenuItemType, FilterType} from "./const.js";
+import {getRating} from "./utils/common.js";
+import {getFilmsByFilter} from "./utils/filter.js";
 
 // Количество отображаемых фильмов
 const FILM_COUNT = 30;
@@ -37,15 +37,13 @@ const commentsModel = new CommentsModel();
 commentsModel.setComments(films);
 const models = {filmsModel, commentsModel};
 
-const filters = generateFilters(filmsModel.getFilmsAll());
-const profile = generateProfile(filters.history);
-
 const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 const siteFooterElement = document.querySelector(`.footer`);
 
-// Профиль (звание) пользователя в шапке сайта
-render(siteHeaderElement, new ProfileComponent(profile));
+// Профиль (звание) пользователя в шапке сайта и статистике
+const userRating = getRating(getFilmsByFilter(filmsModel.getFilmsAll(), FilterType.HISTORY).length);
+render(siteHeaderElement, new ProfileComponent(userRating));
 
 // Меню сайта (навигация)
 const menuComponent = new MenuComponent();
@@ -63,7 +61,7 @@ const pageController = new PageController(filmsComponent, models);
 pageController.render();
 
 // Секция статистики
-const statisticsComponent = new StatisticsComponent(filmsModel);
+const statisticsComponent = new StatisticsComponent(filmsModel, userRating);
 render(siteMainElement, statisticsComponent);
 statisticsComponent.hide();
 

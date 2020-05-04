@@ -29,3 +29,10 @@ export const Period = {
 };
 
 export const Periods = Object.values(Period);
+
+export const Rating = {
+  NONE: ``,
+  NOVICE: `Novice`,
+  FAN: `Fan`,
+  MOVIE_BUFF: `Movie Buff`
+};
