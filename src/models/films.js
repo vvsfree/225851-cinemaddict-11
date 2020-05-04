@@ -70,11 +70,8 @@ export default class FilmsModel {
       });
       return accumulator;
     }, {});
-    let topGenre = ``;
-    if (watchedFilms.length > 0) {
-      topGenre = Object.entries(genres).sort((a, b) => a[0] - b[0])[0][0];
-    }
-    return {watchedCount: watchedFilms.length, totalRuntime, topGenre};
+    const sortedGenres = Object.entries(genres).sort((a, b) => b[1] - a[1]);
+    return {watchedCount: watchedFilms.length, totalRuntime, genres: sortedGenres};
   }
 
   updateFilm(id, film) {

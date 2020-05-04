@@ -27,11 +27,12 @@ import {render} from "./utils/render.js";
 import {MenuItemType} from "./const.js";
 
 // Количество отображаемых фильмов
-const FILM_COUNT = 11;
+const FILM_COUNT = 30;
 
 const films = generateFilms(FILM_COUNT);
 const filmsModel = new FilmsModel();
 filmsModel.setFilms(films);
+
 const commentsModel = new CommentsModel();
 commentsModel.setComments(films);
 const models = {filmsModel, commentsModel};

@@ -1,8 +1,83 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {getDuration, capitalize} from "../utils/common.js";
 import {Period, Periods} from "../const.js";
+import Chart from "chart.js";
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
 const CLASS_NAME = `statistic__filters`;
+const BAR_HEIGHT = 50;
+
+// Это обусловлено тем, что получаем от модели массив отсортированных entries,
+// которые информацию хранят как [key, value]
+const getEntryValues = (genres, idx) => {
+  return Object.values(genres).map((value) => value[idx]);
+};
+
+// Отображаются жанры только просмотренных фильмов, а не все жанры загруженных
+const renderChart = (statisticCtx, genres) => {
+  if (genres.length === 0) {
+    return null;
+  }
+
+  statisticCtx.height = BAR_HEIGHT * genres.length;
+
+  return new Chart(statisticCtx, {
+    plugins: [ChartDataLabels],
+    type: `horizontalBar`,
+    data: {
+      labels: getEntryValues(genres, 0),
+      datasets: [{
+        data: getEntryValues(genres, 1),
+        backgroundColor: `#ffe800`,
+        hoverBackgroundColor: `#ffe800`,
+        anchor: `start`,
+        barThickness: 24
+      }]
+    },
+    options: {
+      plugins: {
+        datalabels: {
+          font: {
+            size: 20
+          },
+          color: `#ffffff`,
+          anchor: `start`,
+          align: `start`,
+          offset: 40,
+        }
+      },
+      scales: {
+        yAxes: [{
+          ticks: {
+            fontColor: `#ffffff`,
+            padding: 100,
+            fontSize: 20
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+        }],
+        xAxes: [{
+          ticks: {
+            display: false,
+            beginAtZero: true
+          },
+          gridLines: {
+            display: false,
+            drawBorder: false
+          },
+        }],
+      },
+      legend: {
+        display: false
+      },
+      tooltips: {
+        enabled: false
+      }
+    }
+  });
+};
 
 const createPeriodMarkup = (period, currentPeriod) => {
   const periodName = capitalize(period).replace(`-`, ` `);
@@ -13,9 +88,13 @@ const createPeriodMarkup = (period, currentPeriod) => {
   );
 };
 
-const createStatisticsTemplate = (model, currentPeriod) => {
-  const {watchedCount, totalRuntime, topGenre} = model.getWatchedStatistics(currentPeriod);
+const createStatisticsTemplate = (statistics, currentPeriod) => {
+  const {watchedCount, totalRuntime, genres} = statistics;
   const totalDuration = getDuration(totalRuntime);
+  let topGenre = ``;
+  if (genres.length > 0) {
+    topGenre = genres[0][0];
+  }
 
   const periodsMarkup = Periods.map((period) => createPeriodMarkup(period, currentPeriod)).join(`\n`);
 
@@ -60,12 +139,15 @@ export default class Statistics extends AbstractSmartComponent {
     super();
     this._model = model;
     this._currentPeriod = Period.ALL_TIME;
+    this._chart = null;
+    // По умолчанию статистика скрыта и при ее (скрытой) отрисовке не будет происходить обращение за стат. данными
+    this._statistics = {watchedCount: 0, totalRuntime: 0, genres: []};
 
     this._subscribeOnEvents();
   }
 
   getTemplate() {
-    return createStatisticsTemplate(this._model, this._currentPeriod);
+    return createStatisticsTemplate(this._statistics, this._currentPeriod);
   }
 
   recoveryListeners() {
@@ -75,6 +157,28 @@ export default class Statistics extends AbstractSmartComponent {
   show() {
     super.show();
     this.rerender();
+  }
+
+  rerender() {
+    // Обновляем статистические данные
+    this._statistics = this._model.getWatchedStatistics(this._currentPeriod);
+    // Отрисовываем свежие данные
+    super.rerender();
+    // Перерисовываем график
+    this._renderChart();
+  }
+
+  _renderChart() {
+    const ctx = this.getElement().querySelector(`.statistic__chart`);
+    this._resetChart();
+    this._chart = renderChart(ctx, this._statistics.genres);
+  }
+
+  _resetChart() {
+    if (this._chart) {
+      this._chart.destroy();
+      this._chart = null;
+    }
   }
 
   _subscribeOnEvents() {
