@@ -17,6 +17,10 @@ export default class FilterController {
     this._filmsModel.setDataChangeHandler(this._onDataChange);
   }
 
+  get filterComponent() {
+    return this._filterComponent;
+  }
+
   render() {
     const container = this._container;
     const allFilms = this._filmsModel.getFilmsAll();
@@ -35,16 +39,9 @@ export default class FilterController {
     if (oldComponent) {
       replace(this._filterComponent, oldComponent);
     } else {
-      render(container, this._filterComponent, RenderPosition.BEFOREEND);
+      render(container.getElement(), this._filterComponent, RenderPosition.AFTERBEGIN);
     }
   }
-
-  // resetFilter() {
-  //   if (this._activeFilterType !== FilterType.ALL) {
-  //     this._filterComponent.setActiveFilter(FilterType.ALL);
-  //     this._onFilterChange(FilterType.ALL);
-  //   }
-  // }
 
   // Вызывается обработчиком в компоненте фильтра
   _onFilterChange(filterType) {

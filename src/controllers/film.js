@@ -99,7 +99,15 @@ export default class FilmController {
   }
 
   _copyDataObject(film, flag, value) {
-    const userInfo = Object.assign({}, film.userInfo, {[flag]: value});
+    const copingObject = {[flag]: value};
+    if (flag === `isWatched`) {
+      if (value) {
+        copingObject.watchingDate = new Date();
+      } else {
+        copingObject.watchingDate = null;
+      }
+    }
+    const userInfo = Object.assign({}, film.userInfo, copingObject);
     return Object.assign({}, film, {userInfo});
   }
 

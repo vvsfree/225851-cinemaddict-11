@@ -1,4 +1,5 @@
 import {generateComments} from "./comment.js";
+import {shuffle} from "../utils/common.js";
 
 const SAMPLE_FILMS = [
   {title: `Made for Each Other`, poster: `made-for-each-other.png`},
@@ -8,6 +9,10 @@ const SAMPLE_FILMS = [
   {title: `The Dance of Life`, poster: `the-dance-of-life.jpg`},
   {title: `The Great Flamarion`, poster: `the-great-flamarion.jpg`},
   {title: `The Man with The Golden Arm`, poster: `the-man-with-the-golden-arm.jpg`},
+];
+
+const SAMPLE_GENRES = [
+  `Drama`, `Film-Noir`, `Mystery`, `SCI-FI`, `Tragedy`, `Comedy`, `Western`
 ];
 
 const SAMPLE_PHRASES = [
@@ -41,9 +46,9 @@ const getRandomArrayItem = (arr) => {
   return arr[getRandomInteger(1, arr.length) - 1];
 };
 
-const getRandomDate = () => {
+const getRandomDate = (params = {yearBegin: 1932, yearEnd: 2019}) => {
   let targetDate = new Date(
-      getRandomInteger(1932, 2019),
+      getRandomInteger(params.yearBegin, params.yearEnd),
       getRandomInteger(1, 12),
       getRandomInteger(1, 31)
   );
@@ -88,7 +93,7 @@ const generateFilm = () => {
   // Страна
   const country = `USA`;
   // Жанр(ы)
-  const genres = [`Drama`, `Film-Noir`, `Mystery`];
+  const genres = shuffle(SAMPLE_GENRES).slice(0, getRandomInteger(1, SAMPLE_GENRES.length - 1));
   // Полное описание
   const description = generateDescription(getRandomInteger(1, 5));
 
@@ -98,8 +103,11 @@ const generateFilm = () => {
   const userInfo = {
     isWaiting: getRandomBoolean(),
     isWatched: getRandomBoolean(),
+    watchingDate: ``,
     isFavorite: getRandomBoolean()
   };
+
+  userInfo.watchingDate = userInfo.isWatched ? getRandomDate({yearBegin: 2018, yearEnd: 2020}) : null;
 
   return {
     id,

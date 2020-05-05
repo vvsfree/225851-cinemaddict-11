@@ -2,7 +2,10 @@ import AbstractComponent from "./abstract-component.js";
 import {EMOJIS} from "../const.js";
 import {createElement} from "../utils/render.js";
 
-const createEmojiImgMarkup = (emoji, size = 30) => {
+const IMG_SIZE = 30;
+const IMG_LARGE_SIZE = 55;
+
+const createEmojiImgMarkup = (emoji, size = IMG_SIZE) => {
   return emoji ? `<img src="./images/emoji/${emoji}.png" width="${size}" height="${size}" alt="emoji-${emoji}">` : ``;
 };
 
@@ -74,7 +77,7 @@ export default class FilmDetails extends AbstractComponent {
       .forEach((element) => {
         element.addEventListener(`change`, (evt) => {
           this._emoji = evt.target.value;
-          const emojiImgMarkup = createEmojiImgMarkup(evt.target.value, 55);
+          const emojiImgMarkup = createEmojiImgMarkup(evt.target.value, IMG_LARGE_SIZE);
           const imgElement = createElement(emojiImgMarkup);
           const emojiContainer = this.getElement().querySelector(`.film-details__add-emoji-label`);
           if (emojiContainer.hasChildNodes()) {

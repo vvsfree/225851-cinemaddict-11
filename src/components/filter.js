@@ -1,12 +1,9 @@
 import AbstractComponent from "./abstract-component.js";
 import {FilterType} from "../const.js";
+import {capitalize} from "../utils/common.js";
 
 const CLASS_NAME = `main-navigation__item`;
 const ACTIVE_CLASS_NAME = `${CLASS_NAME}--active`;
-
-const capitalize = (str) => {
-  return str.charAt(0).toUpperCase() + str.slice(1);
-};
 
 const createFilterMarkup = (filter, options = {}) => {
   const {name, count, isActive} = filter;
@@ -24,13 +21,10 @@ const createFilterTemplate = (filters) => {
   const allFilter = filters.find((it) => it.name === FilterType.ALL);
 
   return (
-    `<nav class="main-navigation">
-      <div class="main-navigation__items">
-        ${createFilterMarkup(allFilter, {fullName: `All movies`, hasCount: false})}
-        ${filtersMarkup}
-      </div>
-      <a href="#stats" class="main-navigation__additional">Stats</a>
-    </nav>`
+    `<div class="main-navigation__items">
+      ${createFilterMarkup(allFilter, {fullName: `All movies`, hasCount: false})}
+      ${filtersMarkup}
+    </div>`
   );
 };
 
@@ -52,6 +46,7 @@ export default class Filter extends AbstractComponent {
         if (activeElement !== element) {
           activeElement.classList.remove(ACTIVE_CLASS_NAME);
           element.classList.add(ACTIVE_CLASS_NAME);
+
           handler(element.dataset.filterType);
         }
       });

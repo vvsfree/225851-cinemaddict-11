@@ -37,7 +37,7 @@ export default class CommentsController {
   // Отрисовка отдельных комментариев
   _renderComments() {
     const film = this._container.film;
-    this._commentControllers = this._commentsModel.getComments(film).forEach((comment) => {
+    this._commentsModel.getComments(film).forEach((comment) => {
       new CommentController(this._commentsComponent, this._onCommentDataChange).render(comment);
     });
   }

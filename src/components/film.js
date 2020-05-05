@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {getYear, getDuration} from "../utils/common.js";
+import {getYear, getDurationStr} from "../utils/common.js";
 
 const CONTROLS_CLASS_NAME = `film-card__controls-item`;
 
@@ -19,7 +19,7 @@ const createFilmTemplate = (film) => {
       <p class="film-card__rating">${rating}</p>
       <p class="film-card__info">
         <span class="film-card__year">${getYear(releaseDate)}</span>
-        <span class="film-card__duration">${getDuration(runtime)}</span>
+        <span class="film-card__duration">${getDurationStr(runtime)}</span>
         <span class="film-card__genre">${genres[0]}</span>
       </p>
       <img src="./images/posters/${poster}" alt="${title}" class="film-card__poster">

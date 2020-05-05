@@ -1,5 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
-import {formatFilmDate, getDuration} from "../utils/common.js";
+import {formatFilmDate, getDurationStr} from "../utils/common.js";
 
 const createCheckboxControlMarkup = (text, name, isActive) => {
   const isChecked = isActive ? `checked` : ``;
@@ -73,7 +73,7 @@ const createFilmDetailsTemplate = (film) => {
                 ${generateDetailsTableRow(`Writers`, writers.join(`, `))}
                 ${generateDetailsTableRow(`Actors`, actors.join(`, `))}
                 ${generateDetailsTableRow(`Release Date`, formatFilmDate(releaseDate))}
-                ${generateDetailsTableRow(`Runtime`, getDuration(runtime))}
+                ${generateDetailsTableRow(`Runtime`, getDurationStr(runtime))}
                 ${generateDetailsTableRow(`Country`, country)}
                 ${generateDetailsTableRow(`Genre${genres.length > 1 ? `s` : ``}`, genresMarkup)}
               </table>

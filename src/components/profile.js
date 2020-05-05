@@ -1,23 +1,22 @@
 import AbstractComponent from "./abstract-component.js";
 
-const createProfileTemplate = (profile) => {
-  const {rating, avatar} = profile;
+const createProfileTemplate = (rating) => {
   return (
     `<section class="header__profile profile">
       <p class="profile__rating">${rating}</p>
-      <img class="profile__avatar" src="images/${avatar}" alt="Avatar" width="35" height="35">
+      <img class="profile__avatar" src="images/bitmap@2x.png" alt="Avatar" width="35" height="35">
     </section>`
   );
 };
 
 export default class Profile extends AbstractComponent {
-  constructor(profile) {
+  constructor(rating) {
     super();
 
-    this._profile = profile;
+    this._rating = rating;
   }
 
   getTemplate() {
-    return createProfileTemplate(this._profile);
+    return createProfileTemplate(this._rating);
   }
 }
