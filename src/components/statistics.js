@@ -1,6 +1,6 @@
 import AbstractSmartComponent from "./abstract-smart-component.js";
 import {getDuration, capitalize} from "../utils/common.js";
-import {Period, Periods} from "../const.js";
+import {Period, Periods, Rating} from "../const.js";
 import {getWatchedStatistics} from "../utils/statistics.js";
 import Chart from "chart.js";
 import ChartDataLabels from 'chartjs-plugin-datalabels';
@@ -136,7 +136,7 @@ const createStatisticsTemplate = (statistics, currentPeriod, userRating) => {
 };
 
 export default class Statistics extends AbstractSmartComponent {
-  constructor(model, userRating) {
+  constructor(model) {
     super();
     this._model = model;
     this._currentPeriod = Period.ALL_TIME;
@@ -145,7 +145,7 @@ export default class Statistics extends AbstractSmartComponent {
     this._statistics = {watchedCount: 0, totalRuntime: 0, genres: []};
 
     // Рейтинг рассчитывается при загрузке приложения один раз и передается в этот конструктор
-    this._userRating = userRating;
+    this._userRating = Rating.NONE;
 
     this._subscribeOnEvents();
   }
@@ -161,6 +161,11 @@ export default class Statistics extends AbstractSmartComponent {
   show() {
     super.show();
     this.rerender();
+  }
+
+  setRating(rating) {
+    this._userRating = rating;
+    this.getElement().querySelector(`.statistic__rank-label`).textContent = rating;
   }
 
   rerender() {

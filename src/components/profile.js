@@ -1,4 +1,5 @@
 import AbstractComponent from "./abstract-component.js";
+import {Rating} from "../const.js";
 
 const createProfileTemplate = (rating) => {
   return (
@@ -10,13 +11,18 @@ const createProfileTemplate = (rating) => {
 };
 
 export default class Profile extends AbstractComponent {
-  constructor(rating) {
+  constructor() {
     super();
 
-    this._rating = rating;
+    this._rating = Rating.NONE;
   }
 
   getTemplate() {
     return createProfileTemplate(this._rating);
+  }
+
+  setRating(rating) {
+    this._rating = rating;
+    this.getElement().querySelector(`.profile__rating`).textContent = rating;
   }
 }

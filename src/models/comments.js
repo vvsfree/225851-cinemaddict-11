@@ -7,13 +7,8 @@ export default class CommentsModel {
     this._dataChangeHandlers = [];
   }
 
-  setComments(films) {
-    this._comments = [];
-    films.forEach((film) => {
-      film.comments.forEach((comment) => {
-        this._comments.push(Object.assign({}, comment, {filmId: film.id}));
-      });
-    });
+  setComments(comments) {
+    this._comments = this._comments.concat(...comments);
   }
 
   getComments(film) {
