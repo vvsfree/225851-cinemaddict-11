@@ -45,10 +45,11 @@ const getSortedFilms = (films, sortType) => {
 
 
 export default class PageController {
-  constructor(container, models) {
+  constructor(container, models, api) {
     this._container = container;
     this._filmsModel = models.filmsModel;
     this._commentsModel = models.commentsModel;
+    this._api = api;
 
     this._showedFilmControllers = [];
     this._topRatedFilmControllers = [];
@@ -57,6 +58,7 @@ export default class PageController {
     this._showingFilmCount = SHOWING_FILM_COUNT_ON_START;
 
     this._sortComponent = new SortComponent();
+    this._loadingFilmList = new FilmListComponent({title: `Loading...`});
     this._noFilmList = new FilmListComponent({title: `There are no movies in our database`});
     this._mainFilmList = new FilmListComponent({title: `All movies. Upcoming`, isTitleHidden: true});
     this._topRatedFilmList = new FilmListComponent({title: `Top rated`, hasExtraModifier: true});
@@ -82,12 +84,20 @@ export default class PageController {
     this._sortComponent.show();
   }
 
-  render() {
-    const films = this._filmsModel.getFilms();
+  // Заглушка на время загрузки фильмов
+  renderLoadingMessage() {
+    render(this._container.getElement(), this._loadingFilmList);
+  }
 
+  removeLoadingMessage() {
+    remove(this._loadingFilmList);
+  }
+
+  render() {
     // Сортировка
     render(this._container.getElement(), this._sortComponent, RenderPosition.BEFORE);
 
+    const films = this._filmsModel.getFilms();
     // Если фильмов нет, то показываем соответствующее сообщение
     if (films.length === 0) {
       render(this._container.getElement(), this._noFilmList);
@@ -171,18 +181,21 @@ export default class PageController {
   }
 
   _onDataChange(oldData, newData) {
-    const isSuccess = this._filmsModel.updateFilm(oldData.id, newData);
-    if (isSuccess) {
-      [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
-      .forEach((controllerGroup) => {
-        controllerGroup.forEach((controller) => {
-          const film = controller.filmComponent.film;
-          if (film === oldData) {
-            controller.render(newData);
-          }
-        });
+    this._api.updateFilm(oldData.id, newData)
+      .then((filmModel) => {
+        const isSuccess = this._filmsModel.updateFilm(oldData.id, filmModel);
+        if (isSuccess) {
+          [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
+          .forEach((controllerGroup) => {
+            controllerGroup.forEach((controller) => {
+              const film = controller.filmComponent.film;
+              if (film === oldData) {
+                controller.render(filmModel);
+              }
+            });
+          });
+        }
       });
-    }
   }
 
   _onViewChange() {

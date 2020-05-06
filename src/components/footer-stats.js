@@ -1,4 +1,4 @@
-import AbstractComponent from "./abstract-component.js";
+import AbstractSmartComponent from "./abstract-smart-component.js";
 
 const createFooterStatsTemplate = (count) => {
   return (
@@ -6,14 +6,23 @@ const createFooterStatsTemplate = (count) => {
   );
 };
 
-export default class FooterStats extends AbstractComponent {
-  constructor(count) {
+export default class FooterStats extends AbstractSmartComponent {
+  constructor() {
     super();
 
-    this._count = count;
+    this._count = 0;
   }
 
   getTemplate() {
     return createFooterStatsTemplate(this._count);
+  }
+
+  recoveryListeners() {
+    return;
+  }
+
+  setCount(count) {
+    this._count = count;
+    this.rerender();
   }
 }
