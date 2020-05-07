@@ -113,14 +113,15 @@ export default class FilmDetails extends AbstractComponent {
   }
 
   getData() {
-    const form = this.getElement().querySelector(`.film-details__inner`);
-    const formData = new FormData(form);
+    return new FormData(this._getForm());
+  }
 
-    // Эти данные дорисовываются компонентом CommentsComponent (comments.js)
-    return {
-      emoji: formData.get(`comment-emoji`),
-      text: formData.get(`comment`)
-    };
+  enableForm() {
+    this._setForm(false);
+  }
+
+  disableForm() {
+    this._setForm(true);
   }
 
   // Место, куда добавляется секция комментариев
@@ -143,5 +144,17 @@ export default class FilmDetails extends AbstractComponent {
 
   setFavoriteInputChangeHandler(handler) {
     this.getElement().querySelector(`#favorite`).addEventListener(`change`, handler);
+  }
+
+  _getForm() {
+    return this.getElement().querySelector(`.film-details__inner`);
+  }
+
+  _setForm(isDisabled) {
+    Array.from(this._getForm().elements)
+    .filter((element) => !element.classList.contains(`film-details__close-btn`))
+    .forEach((element) => {
+      element.disabled = isDisabled;
+    });
   }
 }

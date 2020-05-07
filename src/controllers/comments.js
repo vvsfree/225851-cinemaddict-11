@@ -1,37 +1,72 @@
 // Отрисовка элементов
 import {render} from "../utils/render.js";
+import {SHAKE_ANIMATION_TIMEOUT} from "../const.js";
 
 // Секция, отвечающая за комментарии в детальной информации о фильме
 import CommentsComponent from "../components/comments.js";
 // Контроллер комментария
 import CommentController from "../controllers/comment.js";
 
+import CommentModel from "../models/comment.js";
+
+import Film from "../models/film.js";
+
+const parseFormData = (formData) => {
+  return new CommentModel({
+    "id": null,
+    "author": null,
+    "comment": formData.get(`comment`),
+    "emotion": formData.get(`comment-emoji`),
+    "date": new Date().toISOString(),
+  }, null);
+};
 
 export default class CommentsController {
-  constructor(container, commentsModel, onDataChange) {
+  constructor(container, api, commentsModel, onDataChange) {
     // FilmDetailsComponent
     this._container = container;
+    this._api = api;
     this._commentsModel = commentsModel;
     this._onDataChange = onDataChange;
 
     this._commentsComponent = null;
 
     this._onCommentDataChange = this._onCommentDataChange.bind(this);
-
+    this._ctrlEnterKeyDownHandler = this._ctrlEnterKeyDownHandler.bind(this);
   }
 
   // Отрисовка секции комментариев
   render() {
     this._commentsComponent = new CommentsComponent(this._container.film);
     // Используется, чтобы отловить нажатие Ctrl+Enter на поле комментария
-    this._commentsComponent.setCtrlEnterKeyDownHandler((evt) => {
-      if ((evt.key === `Enter`) && (evt.ctrlKey || evt.metaKey)) {
-        this._onCommentDataChange(null, this._container.getData());
-      }
-    });
+    this._commentsComponent.setCtrlEnterKeyDownHandler(this._ctrlEnterKeyDownHandler);
 
     render(this._container.getCommentsEntryPointElement(), this._commentsComponent);
     this._renderComments();
+  }
+
+  shake() {
+    const newCommentElement = this._commentsComponent.getNewCommentElement();
+    newCommentElement.style.animation = `shake ${SHAKE_ANIMATION_TIMEOUT / 1000}s`;
+
+    setTimeout(() => {
+      // Разблокируем форму
+      this._container.enableForm();
+      // Опять даем возможность нажимать Ctrl+Enter
+      this._commentsComponent.setCtrlEnterKeyDownHandler(this._ctrlEnterKeyDownHandler);
+      // Убираем анимацию
+      newCommentElement.style.animation = ``;
+      // Необходимо форме нарисовать красную обводку
+      this._commentsComponent.setError();
+    }, SHAKE_ANIMATION_TIMEOUT);
+  }
+
+  _ctrlEnterKeyDownHandler() {
+    const commentModel = parseFormData(this._container.getData());
+    // Блокируем форму. Если все пройдет успешно, форма перерисуется и блокировки не будет
+    // В случае ошибки, блокировка снимается в shake(), который есть реакция на ошибку.
+    this._container.disableForm();
+    this._onCommentDataChange(this, null, commentModel);
   }
 
   // Отрисовка отдельных комментариев
@@ -42,18 +77,42 @@ export default class CommentsController {
     });
   }
 
-  _onCommentDataChange(oldData, newData) {
+  _onCommentDataChange(controller, oldData, newData) {
     const film = this._container.film;
+    const changedFilm = Film.clone(film);
     if (newData === null) {
-      if (!this._commentsModel.removeComment(oldData.id)) {
-        return;
-      }
-    } else if (oldData === null) {
-      this._commentsModel.addComment(Object.assign(newData, {filmId: film.id}));
-    } else {
-      return;
-    }
+      // Удаляем на сервере
+      this._api.deleteComment(oldData.id)
+        .then(() => {
+          // Удаляем в модели комментариев
+          if (this._commentsModel.removeComment(oldData.id)) {
+            // Изменяем объект фильма
+            changedFilm.removeComment(oldData.id);
 
-    this._onDataChange(film, Object.assign({}, film, {commentsCount: this._commentsModel.getComments(film).length}));
+            // Изменяем фильм (список id комментариев) на сервере и в модели фильмов
+            this._onDataChange(film, changedFilm);
+          }
+        })
+        .catch(() => {
+          controller.shake();
+        });
+    } else if (oldData === null) {
+      // Добавляем комментарий на сервере
+      this._api.createComment(newData, film.id)
+        .then((result) => {
+          // Получим уже разобранный массив элементов CommentModel
+          // Среди них есть тот, который мы добавили. Нам он нужен, так как там появились новые поля: id, author
+          // Будет проблематично найти именно его, поэтому нужно все комментарии в модели заменить на новые
+          this._commentsModel.updateComments(result.models, film.id);
+          // Тоже самое нужно сделать и с фильмом: ему нужно заменить массив идентификаторов комментариев на новый
+          changedFilm.comments = result.ids;
+
+          // Изменяем фильм (список id комментариев) на сервере и в модели фильмов
+          this._onDataChange(film, changedFilm);
+        })
+        .catch(() => {
+          controller.shake();
+        });
+    }
   }
 }

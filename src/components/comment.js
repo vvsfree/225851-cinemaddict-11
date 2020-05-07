@@ -2,6 +2,11 @@ import AbstractComponent from "./abstract-component.js";
 import {formatCommentDateAsHuman} from "../utils/common.js";
 import {encode} from "he";
 
+const ButtonLabel = {
+  ENABLED: `Delete`,
+  DISABLED: `Deleting...`
+};
+
 const createCommentTemplate = (comment) => {
   const {emoji, text: notSanitizedText, author, day} = comment;
   const text = encode(notSanitizedText);
@@ -33,10 +38,27 @@ export default class Comment extends AbstractComponent {
     return createCommentTemplate(this._comment);
   }
 
+  enableDeleteButton() {
+    const button = this._getDeleteButton();
+    button.disabled = false;
+    button.textContent = ButtonLabel.ENABLED;
+  }
+
+  disableDeleteButton() {
+    const button = this._getDeleteButton();
+    button.disabled = true;
+    button.textContent = ButtonLabel.DISABLED;
+  }
+
   setDeleteButtonClickHandler(handler) {
-    this.getElement().querySelector(`.film-details__comment-delete`).addEventListener(`click`, (evt) => {
+    this._getDeleteButton().addEventListener(`click`, (evt) => {
       evt.preventDefault();
+      this.disableDeleteButton();
       handler();
     });
+  }
+
+  _getDeleteButton() {
+    return this.getElement().querySelector(`.film-details__comment-delete`);
   }
 }
