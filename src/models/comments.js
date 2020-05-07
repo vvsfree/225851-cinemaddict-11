@@ -1,10 +1,6 @@
-import {generateId} from "../mock/film";
-
 export default class CommentsModel {
   constructor() {
     this._comments = [];
-
-    this._dataChangeHandlers = [];
   }
 
   setComments(comments) {
@@ -19,6 +15,11 @@ export default class CommentsModel {
     return this._comments;
   }
 
+  updateComments(comments, filmId) {
+    this._comments = this._comments.filter((comment) => comment.filmId !== filmId);
+    this._comments = [].concat(this._comments, comments);
+  }
+
   removeComment(id) {
     const index = this._comments.findIndex((it) => it.id === id);
 
@@ -27,17 +28,8 @@ export default class CommentsModel {
     }
 
     this._comments = [].concat(this._comments.slice(0, index), this._comments.slice(index + 1));
-    this._callHandlers(this._dataChangeHandlers);
 
     return true;
-  }
-
-  addComment(comment) {
-    comment.id = generateId();
-    comment.author = `Not passed to server`;
-    comment.date = new Date().toISOString;
-    this._comments = [].concat(comment, this._comments);
-    this._callHandlers(this._dataChangeHandlers);
   }
 
   _callHandlers(handlers) {

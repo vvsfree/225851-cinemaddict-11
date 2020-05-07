@@ -73,4 +73,8 @@ export default class Film {
   static clone(data) {
     return new Film(data.toRAW());
   }
+
+  removeComment(id) {
+    this.comments = this.comments.filter((it) => it !== id);
+  }
 }

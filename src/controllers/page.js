@@ -128,7 +128,7 @@ export default class PageController {
 
   _renderFilmCollection(filmList, filmCollection) {
     return filmCollection.map((film) => {
-      const filmController = new FilmController(filmList, this._commentsModel, this._onDataChange, this._onViewChange);
+      const filmController = new FilmController(filmList, this._commentsModel, this._api, this._onDataChange, this._onViewChange);
       filmController.render(film);
       return filmController;
     });
