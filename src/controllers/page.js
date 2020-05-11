@@ -47,8 +47,8 @@ const getSortedFilms = (films, sortType) => {
 export default class PageController {
   constructor(container, models, api) {
     this._container = container;
+    this._models = models;
     this._filmsModel = models.filmsModel;
-    this._commentsModel = models.commentsModel;
     this._api = api;
 
     this._showedFilmControllers = [];
@@ -69,9 +69,12 @@ export default class PageController {
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onModelUpdate = this._onModelUpdate.bind(this);
 
     this._sortComponent.setSortTypeClickHandler(this._onSortTypeChange);
     this._filmsModel.setFilterChangeHandler(this._onFilterChange);
+
+    this._filmsModel.setModelUpdateHandler(this._onModelUpdate);
   }
 
   hide() {
@@ -128,7 +131,7 @@ export default class PageController {
 
   _renderFilmCollection(filmList, filmCollection) {
     return filmCollection.map((film) => {
-      const filmController = new FilmController(filmList, this._commentsModel, this._api, this._onDataChange, this._onViewChange);
+      const filmController = new FilmController(filmList, this._models, this._api, this._onDataChange, this._onViewChange);
       filmController.render(film);
       return filmController;
     });
@@ -173,28 +176,29 @@ export default class PageController {
     this._showingFilmCount = this._showedFilmControllers.length;
   }
 
-  _updateFilms(count) {
+  _rerenderFilms(count) {
     this._removeFilms();
     const films = this._filmsModel.getFilms();
     this._renderFilms(films.slice(0, count));
     this._renderLoadMoreButton(films);
   }
 
+  _onModelUpdate(oldData, filmModel) {
+    [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
+    .forEach((controllerGroup) => {
+      controllerGroup.forEach((controller) => {
+        const film = controller.filmComponent.film;
+        if (film === oldData) {
+          controller.render(filmModel);
+        }
+      });
+    });
+  }
+
   _onDataChange(oldData, newData) {
     this._api.updateFilm(oldData.id, newData)
       .then((filmModel) => {
-        const isSuccess = this._filmsModel.updateFilm(oldData.id, filmModel);
-        if (isSuccess) {
-          [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
-          .forEach((controllerGroup) => {
-            controllerGroup.forEach((controller) => {
-              const film = controller.filmComponent.film;
-              if (film === oldData) {
-                controller.render(filmModel);
-              }
-            });
-          });
-        }
+        this._filmsModel.updateFilm(oldData.id, filmModel);
       });
   }
 
@@ -216,6 +220,6 @@ export default class PageController {
 
   _onFilterChange() {
     this._sortComponent.setSortType(SortType.DEFAULT);
-    this._updateFilms(SHOWING_FILM_COUNT_ON_START);
+    this._rerenderFilms(SHOWING_FILM_COUNT_ON_START);
   }
 }

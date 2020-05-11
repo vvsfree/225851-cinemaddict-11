@@ -8,6 +8,8 @@ export default class FilmsModel {
 
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
+
+    this._modelUpdateHandler = null;
   }
 
   setFilms(films) {
@@ -35,9 +37,14 @@ export default class FilmsModel {
       return false;
     }
 
+    const oldData = this._films[index];
+
     this._films = [].concat(this._films.slice(0, index), film, this._films.slice(index + 1));
 
     this._callHandlers(this._dataChangeHandlers);
+
+    // Вызовет перерисовку фильмов в контроллере страницы
+    this._modelUpdateHandler(oldData, film);
 
     return true;
   }
@@ -48,6 +55,10 @@ export default class FilmsModel {
 
   setDataChangeHandler(handler) {
     this._dataChangeHandlers.push(handler);
+  }
+
+  setModelUpdateHandler(handler) {
+    this._modelUpdateHandler = handler;
   }
 
   _callHandlers(handlers) {

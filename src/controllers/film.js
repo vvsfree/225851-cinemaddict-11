@@ -17,9 +17,9 @@ const Mode = {
 };
 
 export default class FilmController {
-  constructor(container, commentsModel, api, onDataChange, onViewChange) {
+  constructor(container, models, api, onDataChange, onViewChange) {
     this._container = container;
-    this._commentsModel = commentsModel;
+    this._models = models;
     this._api = api;
     this._onDataChange = onDataChange;
     this._onViewChange = onViewChange;
@@ -116,7 +116,7 @@ export default class FilmController {
   }
 
   _renderComments() {
-    new CommentsController(this._filmDetailsComponent, this._api, this._commentsModel, this._onDataChange).render();
+    new CommentsController(this._filmDetailsComponent, this._models, this._api).render();
   }
 
   _removeFilmDetails() {

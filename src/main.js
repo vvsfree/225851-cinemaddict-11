@@ -1,4 +1,6 @@
-import API from "./api.js";
+import API from "./api/index.js";
+import Provider from "./api/provider.js";
+import Store from "./api/store.js";
 // Звание пользователя
 import ProfileComponent from "./components/profile.js";
 // Меню сайта (навигация)
@@ -18,19 +20,21 @@ import PageController from "./controllers/page.js";
 import FilmsModel from "./models/films.js";
 import CommentsModel from "./models/comments.js";
 
-// Генерация объектов
-// import {generateFilms} from "./mock/film.js";
-
 // Отрисовка элементов
 import {render} from "./utils/render.js";
 import {MenuItemType, FilterType} from "./const.js";
-import {getRating} from "./utils/common.js";
+import {getRating, getStoreName} from "./utils/common.js";
 import {getFilmsByFilter} from "./utils/filter.js";
 
 const END_POINT = `https://11.ecmascript.pages.academy/cinemaddict`;
 const AUTHORIZATION = `Basic 001w590ik29889a=`;
+const STORE_VER = `v1`;
 
 const api = new API(END_POINT, AUTHORIZATION);
+const filmStore = new Store(getStoreName(`film`, STORE_VER), window.localStorage);
+const commentStore = new Store(getStoreName(`comment`, STORE_VER), window.localStorage);
+const apiWithProvider = new Provider(api, filmStore, commentStore);
+
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 const models = {filmsModel, commentsModel};
@@ -55,7 +59,7 @@ filterController.render();
 const filmsComponent = new FilmsComponent();
 render(siteMainElement, filmsComponent);
 
-const pageController = new PageController(filmsComponent, models, api);
+const pageController = new PageController(filmsComponent, models, apiWithProvider);
 pageController.renderLoadingMessage();
 
 // Секция статистики
@@ -93,11 +97,11 @@ filmsModel.setDataChangeHandler(() => {
 // Загрузка данных с сервера
 // Используем вариант от академии: загружаем сразу все. Если при загрузке комментариев произошла ошибка,
 // то действуем так, как если бы не загрузились сами фильмы
-api.getFilms()
+apiWithProvider.getFilms()
   .then((films) => {
     filmsModel.setFilms(films);
     // Даем много обещаний загрузить все комментарии по всем фильмам
-    return Promise.all(filmsModel.getFilmsAll().map((film) => api.getComments(film)));
+    return Promise.all(filmsModel.getFilmsAll().map((film) => apiWithProvider.getComments(film)));
   })
   .then((comments) => {
     commentsModel.setComments(comments);
@@ -111,3 +115,18 @@ api.getFilms()
     pageController.removeLoadingMessage();
     pageController.render();
   });
+
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
+window.addEventListener(`online`, () => {
+  document.title = document.title.replace(` [offline]`, ``);
+  if (!apiWithProvider.isSynced()) {
+    apiWithProvider.sync();
+  }
+});
+
+window.addEventListener(`offline`, () => {
+  document.title += ` [offline]`;
+});

@@ -22,12 +22,12 @@ const parseFormData = (formData) => {
 };
 
 export default class CommentsController {
-  constructor(container, api, commentsModel, onDataChange) {
+  constructor(container, models, api) {
     // FilmDetailsComponent
     this._container = container;
+    this._filmsModel = models.filmsModel;
+    this._commentsModel = models.commentsModel;
     this._api = api;
-    this._commentsModel = commentsModel;
-    this._onDataChange = onDataChange;
 
     this._commentsComponent = null;
 
@@ -79,20 +79,21 @@ export default class CommentsController {
 
   _onCommentDataChange(controller, oldData, newData) {
     const film = this._container.film;
-    const changedFilm = Film.clone(film);
     if (newData === null) {
       // Удаляем на сервере
-      this._api.deleteComment(oldData.id)
-        .then(() => {
-          // Удаляем в модели комментариев
-          if (this._commentsModel.removeComment(oldData.id)) {
-            // Изменяем объект фильма
-            changedFilm.removeComment(oldData.id);
+      this._api.deleteComment(oldData)
+      .then(() => {
+        // Удаляем в модели комментариев
+        if (this._commentsModel.removeComment(oldData.id)) {
+          // Изменяем модель фильма - поле comments
+          const changedFilm = Film.clone(film);
+          changedFilm.removeComment(oldData.id);
 
-            // Изменяем фильм (список id комментариев) на сервере и в модели фильмов
-            this._onDataChange(film, changedFilm);
-          }
-        })
+          // Заменим в модели старый фильм на новый
+          // В модели сработает обработчик на изменение модели и перерисуется фильм во всех секциях (где он есть) на главном экране
+          this._filmsModel.updateFilm(film.id, changedFilm);
+        }
+      })
         .catch(() => {
           controller.shake();
         });
@@ -104,11 +105,11 @@ export default class CommentsController {
           // Среди них есть тот, который мы добавили. Нам он нужен, так как там появились новые поля: id, author
           // Будет проблематично найти именно его, поэтому нужно все комментарии в модели заменить на новые
           this._commentsModel.updateComments(result.models, film.id);
-          // Тоже самое нужно сделать и с фильмом: ему нужно заменить массив идентификаторов комментариев на новый
-          changedFilm.comments = result.ids;
 
-          // Изменяем фильм (список id комментариев) на сервере и в модели фильмов
-          this._onDataChange(film, changedFilm);
+          // Также получим измененный фильм (изменились данные в структуре movie.comments)
+          // Заменим в модели старый фильм на новый
+          // В модели сработает обработчик на изменение модели и перерисуется фильм во всех секциях (где он есть) на главном экране
+          this._filmsModel.updateFilm(film.id, result.film);
         })
         .catch(() => {
           controller.shake();
