@@ -116,6 +116,10 @@ apiWithProvider.getFilms()
     pageController.render();
   });
 
+window.addEventListener(`load`, () => {
+  navigator.serviceWorker.register(`/sw.js`);
+});
+
 window.addEventListener(`online`, () => {
   document.title = document.title.replace(` [offline]`, ``);
   if (!apiWithProvider.isSynced()) {

@@ -14,16 +14,6 @@ export default class Store {
 
   setItem(key, value) {
     this.setItems({[key]: value});
-    // const store = this.getItems();
-
-    // this._storage.setItem(
-    //     this._storeKey,
-    //     JSON.stringify(
-    //         Object.assign({}, store, {
-    //           [key]: value
-    //         })
-    //     )
-    // );
   }
 
   setItems(items) {
