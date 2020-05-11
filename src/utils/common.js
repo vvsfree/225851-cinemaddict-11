@@ -64,3 +64,7 @@ export const getRating = (watchedCount) => {
 
   return rating;
 };
+
+export const getStoreName = (prefix, version) => {
+  return `cinemaddict-${prefix}-storage-${version}`;
+};
