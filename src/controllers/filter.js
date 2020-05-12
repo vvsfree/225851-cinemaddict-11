@@ -11,10 +11,11 @@ export default class FilterController {
     this._activeFilterType = FilterType.ALL;
     this._filterComponent = null;
 
-    this._onDataChange = this._onDataChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
+    this._onDataLoadOrChange = this._onDataLoadOrChange.bind(this);
 
-    this._filmsModel.setDataChangeHandler(this._onDataChange);
+    this._filmsModel.setDataLoadHandler(this._onDataLoadOrChange);
+    this._filmsModel.setDataChangeHandler(this._onDataLoadOrChange);
   }
 
   get filterComponent() {
@@ -51,7 +52,7 @@ export default class FilterController {
 
   // Вызывается из модели, когда изменяются (приходят новые) данные:
   // соответственно, новые значения фильтров пересчитываются
-  _onDataChange() {
+  _onDataLoadOrChange() {
     this.render();
   }
 }

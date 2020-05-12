@@ -13,13 +13,12 @@ import FilmListComponent from "../components/film-list.js";
 import ShowMoreButtonComponent from "../components/show-more-button.js";
 
 // Данные по фильмам в категориях Top rated и Most commented
-// Предполагается, что эти данные будут запрашиваться с сервера
-import {getTopRatedFilms, getMostCommentedFilms} from "../models/extra-film.js";
+import {getTopRatedFilms, getMostCommentedFilms} from "../utils/extra-film.js";
 
 const SHOWING_FILM_COUNT_ON_START = 5;
 const SHOWING_FILM_COUNT_BY_BUTTON = 5;
 
-// Количество фильмов в блоках «Top rated movies» и «Most commented»
+// Максимальное количество фильмов в блоках «Top rated movies» и «Most commented»
 const EXTRA_FILM_COUNT = 2;
 
 const getSortedFilms = (films, sortType) => {
@@ -65,16 +64,16 @@ export default class PageController {
     this._mostCommentedFilmList = new FilmListComponent({title: `Most commented`, hasExtraModifier: true});
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
-    this._onDataChange = this._onDataChange.bind(this);
     this._onViewChange = this._onViewChange.bind(this);
     this._onSortTypeChange = this._onSortTypeChange.bind(this);
     this._onFilterChange = this._onFilterChange.bind(this);
-    this._onModelUpdate = this._onModelUpdate.bind(this);
+    this._onFilmChange = this._onFilmChange.bind(this);
+    this._onCommentsChange = this._onCommentsChange.bind(this);
 
     this._sortComponent.setSortTypeClickHandler(this._onSortTypeChange);
-    this._filmsModel.setFilterChangeHandler(this._onFilterChange);
 
-    this._filmsModel.setModelUpdateHandler(this._onModelUpdate);
+    this._filmsModel.setFilterChangeHandler(this._onFilterChange);
+    this._filmsModel.setDataChangeHandler(this._onFilmChange);
   }
 
   hide() {
@@ -114,13 +113,14 @@ export default class PageController {
 
     // Top rated фильмы
     const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
-    render(this._container.getElement(), this._topRatedFilmList);
-    this._topRatedFilmControllers = this._renderFilmCollection(this._topRatedFilmList, topRatedFilms);
+    if (topRatedFilms.length > 0) {
+      render(this._container.getElement(), this._topRatedFilmList);
+      this._topRatedFilmControllers = this._renderFilmCollection(this._topRatedFilmList, topRatedFilms);
+    }
 
     // Most commented фильмы
-    const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
     render(this._container.getElement(), this._mostCommentedFilmList);
-    this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms);
+    this._renderMostCommentedFilms();
   }
 
   resetSortType() {
@@ -131,7 +131,7 @@ export default class PageController {
 
   _renderFilmCollection(filmList, filmCollection) {
     return filmCollection.map((film) => {
-      const filmController = new FilmController(filmList, this._models, this._api, this._onDataChange, this._onViewChange);
+      const filmController = new FilmController(filmList, this._models, this._api, this._onCommentsChange, this._onViewChange);
       filmController.render(film);
       return filmController;
     });
@@ -183,7 +183,20 @@ export default class PageController {
     this._renderLoadMoreButton(films);
   }
 
-  _onModelUpdate(oldData, filmModel) {
+  _renderMostCommentedFilms() {
+    const films = this._filmsModel.getFilms();
+    const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
+    if (mostCommentedFilms.length === 0) {
+      // Блок нужно спрятать, если нет больше фильмов с комментариями
+      this._mostCommentedFilmList.hide();
+    } else {
+      remove(this._mostCommentedFilmList.getContainerComponent());
+      this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms);
+      this._mostCommentedFilmList.show();
+    }
+  }
+
+  _onFilmChange(oldData, filmModel) {
     [this._showedFilmControllers, this._topRatedFilmControllers, this._mostCommentedFilmControllers]
     .forEach((controllerGroup) => {
       controllerGroup.forEach((controller) => {
@@ -195,11 +208,8 @@ export default class PageController {
     });
   }
 
-  _onDataChange(oldData, newData) {
-    this._api.updateFilm(oldData.id, newData)
-      .then((filmModel) => {
-        this._filmsModel.updateFilm(oldData.id, filmModel);
-      });
+  _onCommentsChange() {
+    this._renderMostCommentedFilms();
   }
 
   _onViewChange() {

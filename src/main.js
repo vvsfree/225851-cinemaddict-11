@@ -87,7 +87,7 @@ menuComponent.setMenuClickHandler((menuItemType) => {
   }
 });
 
-filmsModel.setDataChangeHandler(() => {
+filmsModel.setDataLoadHandler(() => {
   const rating = getRating(getFilmsByFilter(filmsModel.getFilmsAll(), FilterType.HISTORY).length);
   profileComponent.setRating(rating);
   statisticsComponent.setRating(rating);
