@@ -6,15 +6,14 @@ export default class FilmsModel {
     this._films = [];
     this._activeFilterType = FilterType.ALL;
 
+    this._dataLoadHandlers = [];
     this._dataChangeHandlers = [];
     this._filterChangeHandlers = [];
-
-    this._modelUpdateHandler = null;
   }
 
   setFilms(films) {
     this._films = Array.from(films);
-    this._callHandlers(this._dataChangeHandlers);
+    this._callHandlers(this._dataLoadHandlers);
   }
 
   setFilter(filterType) {
@@ -41,27 +40,24 @@ export default class FilmsModel {
 
     this._films = [].concat(this._films.slice(0, index), film, this._films.slice(index + 1));
 
-    this._callHandlers(this._dataChangeHandlers);
-
-    // Вызовет перерисовку фильмов в контроллере страницы
-    this._modelUpdateHandler(oldData, film);
+    this._callHandlers(this._dataChangeHandlers, oldData, film);
 
     return true;
   }
 
-  setFilterChangeHandler(handler) {
-    this._filterChangeHandlers.push(handler);
+  setDataLoadHandler(handler) {
+    this._dataLoadHandlers.push(handler);
   }
 
   setDataChangeHandler(handler) {
     this._dataChangeHandlers.push(handler);
   }
 
-  setModelUpdateHandler(handler) {
-    this._modelUpdateHandler = handler;
+  setFilterChangeHandler(handler) {
+    this._filterChangeHandlers.push(handler);
   }
 
-  _callHandlers(handlers) {
-    handlers.forEach((handler) => handler());
+  _callHandlers(handlers, ...args) {
+    handlers.forEach((handler) => handler(...args));
   }
 }

@@ -17,11 +17,11 @@ const Mode = {
 };
 
 export default class FilmController {
-  constructor(container, models, api, onDataChange, onViewChange) {
+  constructor(container, models, api, onCommentsChange, onViewChange) {
     this._container = container;
     this._models = models;
     this._api = api;
-    this._onDataChange = onDataChange;
+    this._onCommentsChange = onCommentsChange;
     this._onViewChange = onViewChange;
 
     this._mode = Mode.DEFAULT;
@@ -50,7 +50,7 @@ export default class FilmController {
       evt.preventDefault();
       const newFilm = FilmModel.clone(film);
       newFilm.userInfo.isWaiting = !film.userInfo.isWaiting;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     this._filmComponent.setWatchedButtonClickHandler((evt) => {
@@ -59,14 +59,14 @@ export default class FilmController {
       const value = !film.userInfo.isWatched;
       newFilm.userInfo.isWatched = value;
       newFilm.userInfo.watchingDate = value ? new Date() : null;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     this._filmComponent.setFavoriteButtonClickHandler((evt) => {
       evt.preventDefault();
       const newFilm = FilmModel.clone(film);
       newFilm.userInfo.isFavorite = !film.userInfo.isFavorite;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     this._filmDetailsComponent.setCloseBtnClickHandler(this._removeFilmDetails.bind(this));
@@ -74,7 +74,7 @@ export default class FilmController {
     this._filmDetailsComponent.setWatchlistInputChangeHandler((evt) => {
       const newFilm = FilmModel.clone(film);
       newFilm.userInfo.isWaiting = evt.target.checked;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     this._filmDetailsComponent.setWatchedInputChangeHandler((evt) => {
@@ -82,13 +82,13 @@ export default class FilmController {
       const value = evt.target.checked;
       newFilm.userInfo.isWatched = value;
       newFilm.userInfo.watchingDate = value ? new Date() : null;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     this._filmDetailsComponent.setFavoriteInputChangeHandler((evt) => {
       const newFilm = FilmModel.clone(film);
       newFilm.userInfo.isFavorite = evt.target.checked;
-      this._onDataChange(film, newFilm);
+      this._onFilmChange(film, newFilm);
     });
 
     // Отрисовка фильма
@@ -123,6 +123,21 @@ export default class FilmController {
     this._filmDetailsComponent.getElement().remove();
     document.removeEventListener(`keydown`, this._onEscKeyDown);
     this._mode = Mode.DEFAULT;
+
+    if (this._models.commentsModel.isModelChanged()) {
+      // Перерисовываем блок Most Commented
+      this._onCommentsChange();
+
+      // Cбрасываем признак того, что комментарии в popup были изменены
+      this._models.commentsModel.resetModelChanged();
+    }
+  }
+
+  _onFilmChange(oldData, newData) {
+    this._api.updateFilm(oldData.id, newData)
+      .then((filmModel) => {
+        this._models.filmsModel.updateFilm(oldData.id, filmModel);
+      });
   }
 
   _onClick() {
