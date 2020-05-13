@@ -92,10 +92,7 @@ const createPeriodMarkup = (period, currentPeriod) => {
 const createStatisticsTemplate = (statistics, currentPeriod, userRating) => {
   const {watchedCount, totalRuntime, genres} = statistics;
   const totalDuration = getDuration(totalRuntime);
-  let topGenre = ``;
-  if (genres.length > 0) {
-    topGenre = genres[0][0];
-  }
+  const topGenre = genres.length > 0 ? genres[0][0] : ``;
 
   const periodsMarkup = Periods.map((period) => createPeriodMarkup(period, currentPeriod)).join(`\n`);
 
@@ -144,7 +141,7 @@ export default class Statistics extends AbstractSmartComponent {
     // По умолчанию статистика скрыта и при ее (скрытой) отрисовке не будет происходить обращение за стат. данными
     this._statistics = {watchedCount: 0, totalRuntime: 0, genres: []};
 
-    // Рейтинг рассчитывается при загрузке приложения один раз и передается в этот конструктор
+    // Рейтинг пользователя
     this._userRating = Rating.NONE;
 
     this._subscribeOnEvents();
@@ -154,6 +151,11 @@ export default class Statistics extends AbstractSmartComponent {
     return createStatisticsTemplate(this._statistics, this._currentPeriod, this._userRating);
   }
 
+  setRating(rating) {
+    this._userRating = rating;
+    this.getElement().querySelector(`.statistic__rank-label`).textContent = rating;
+  }
+
   recoveryListeners() {
     this._subscribeOnEvents();
   }
@@ -161,11 +163,6 @@ export default class Statistics extends AbstractSmartComponent {
   show() {
     super.show();
     this.rerender();
-  }
-
-  setRating(rating) {
-    this._userRating = rating;
-    this.getElement().querySelector(`.statistic__rank-label`).textContent = rating;
   }
 
   rerender() {

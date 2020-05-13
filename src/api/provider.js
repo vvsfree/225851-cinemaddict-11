@@ -94,8 +94,8 @@ export default class Provider {
           // Это неудобно, придется делать много лишних движений.
 
           // Этот комментарий нужно удалить из локального хранилища комментариев.
-          let storeComments = this._commentStore.getItems()[deletingCommentModel.filmId];
-          storeComments = storeComments.filter((rawComment) => rawComment[`id`] !== deletingCommentModel.id);
+          const storeComments = this._commentStore.getItems()[deletingCommentModel.filmId]
+            .filter((rawComment) => rawComment[`id`] !== deletingCommentModel.id);
           this._commentStore.setItem(deletingCommentModel.filmId, storeComments);
 
           // Производим изменения в локальном хранилище фильмов

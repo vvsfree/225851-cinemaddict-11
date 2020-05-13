@@ -1,4 +1,4 @@
-import API from "./api/index.js";
+import Api from "./api/api.js";
 import Provider from "./api/provider.js";
 import Store from "./api/store.js";
 // Звание пользователя
@@ -30,7 +30,7 @@ const siteHeaderElement = document.querySelector(`.header`);
 const siteMainElement = document.querySelector(`.main`);
 const siteFooterElement = document.querySelector(`.footer`);
 
-const api = new API(END_POINT, AUTHORIZATION);
+const api = new Api(END_POINT, AUTHORIZATION);
 const filmStore = new Store(getStoreName(`film`, STORE_VER), window.localStorage);
 const commentStore = new Store(getStoreName(`comment`, STORE_VER), window.localStorage);
 const apiWithProvider = new Provider(api, filmStore, commentStore);
@@ -84,10 +84,14 @@ menuComponent.setMenuClickHandler((menuItemType) => {
 });
 
 filmsModel.setDataLoadHandler(() => {
+  // Статистика в подвале обновляется только один раз, по окончании загрузки
+  footerStatsComponent.setCount(filmsModel.getFilmsAll().length);
+});
+
+filmsModel.setDataChangeHandler(() => {
   const rating = getRating(getFilmsByFilter(filmsModel.getFilmsAll(), FilterType.HISTORY).length);
   profileComponent.setRating(rating);
   statisticsComponent.setRating(rating);
-  footerStatsComponent.setCount(filmsModel.getFilmsAll().length);
 });
 
 // Загрузка данных с сервера

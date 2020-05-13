@@ -25,13 +25,7 @@ export default class Menu extends AbstractComponent {
         return;
       }
 
-      let itemType;
-      // Внутри данного компонента  будет распологаться фильтр
-      if (evt.target.dataset.filterType) {
-        itemType = MenuItemType.FILTER;
-      } else {
-        itemType = MenuItemType.STATISTICS;
-      }
+      const itemType = evt.target.dataset.filterType ? MenuItemType.FILTER : MenuItemType.STATISTICS;
       handler(itemType);
     });
   }

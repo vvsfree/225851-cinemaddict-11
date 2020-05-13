@@ -10,7 +10,7 @@ const checkStatus = (response) => {
   throw new Error(`${response.status}: ${response.statusText}`);
 };
 
-const API = class {
+export default class Api {
   constructor(endPoint, authorization) {
     this._endPoint = endPoint;
     this._authorization = authorization;
@@ -77,7 +77,4 @@ const API = class {
         throw err;
       });
   }
-};
-
-export default API;
-
+}
