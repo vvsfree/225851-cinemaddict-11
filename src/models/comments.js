@@ -12,8 +12,6 @@ export default class CommentsModel {
     ведь блок будет перерисован и соответствующего фильма там не будет. В этом случае получаем странное поведение:
     комментарий удалили - popup закрылся.
     */
-
-    // Поэтому это признак, а не handler
     this._isModelChanged = false;
   }
 
@@ -31,10 +29,6 @@ export default class CommentsModel {
 
   getComments(film) {
     return this._comments.filter((comment) => comment.filmId === film.id);
-  }
-
-  getCommentsAll() {
-    return this._comments;
   }
 
   updateComments(comments, filmId) {
@@ -55,9 +49,5 @@ export default class CommentsModel {
     this._isModelChanged = true;
 
     return true;
-  }
-
-  _callHandlers(handlers) {
-    handlers.forEach((handler) => handler());
   }
 }

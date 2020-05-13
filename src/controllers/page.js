@@ -5,7 +5,7 @@ import FilmController from "./film.js";
 
 // Сортировка
 import SortComponent from "../components/sort.js";
-import {SortType} from "../const.js";
+import {SortType, SHOWING_FILM_COUNT_ON_START, EXTRA_FILM_COUNT, SHOWING_FILM_COUNT_BY_BUTTON} from "../const.js";
 
 // Секция со списками фильмов. Содержит заголовок и контейнер списка
 import FilmListComponent from "../components/film-list.js";
@@ -14,12 +14,6 @@ import ShowMoreButtonComponent from "../components/show-more-button.js";
 
 // Данные по фильмам в категориях Top rated и Most commented
 import {getTopRatedFilms, getMostCommentedFilms} from "../utils/extra-film.js";
-
-const SHOWING_FILM_COUNT_ON_START = 5;
-const SHOWING_FILM_COUNT_BY_BUTTON = 5;
-
-// Максимальное количество фильмов в блоках «Top rated movies» и «Most commented»
-const EXTRA_FILM_COUNT = 2;
 
 const getSortedFilms = (films, sortType) => {
   let comparator;
@@ -57,11 +51,11 @@ export default class PageController {
     this._showingFilmCount = SHOWING_FILM_COUNT_ON_START;
 
     this._sortComponent = new SortComponent();
-    this._loadingFilmList = new FilmListComponent({title: `Loading...`});
-    this._noFilmList = new FilmListComponent({title: `There are no movies in our database`});
-    this._mainFilmList = new FilmListComponent({title: `All movies. Upcoming`, isTitleHidden: true});
-    this._topRatedFilmList = new FilmListComponent({title: `Top rated`, hasExtraModifier: true});
-    this._mostCommentedFilmList = new FilmListComponent({title: `Most commented`, hasExtraModifier: true});
+    this._loadingFilmListComponent = new FilmListComponent({title: `Loading...`});
+    this._noFilmListComponent = new FilmListComponent({title: `There are no movies in our database`});
+    this._mainFilmListComponent = new FilmListComponent({title: `All movies. Upcoming`, isTitleHidden: true});
+    this._topRatedFilmListComponent = new FilmListComponent({title: `Top rated`, hasExtraModifier: true});
+    this._mostCommentedFilmListComponent = new FilmListComponent({title: `Most commented`, hasExtraModifier: true});
     this._showMoreButtonComponent = new ShowMoreButtonComponent();
 
     this._onViewChange = this._onViewChange.bind(this);
@@ -88,11 +82,11 @@ export default class PageController {
 
   // Заглушка на время загрузки фильмов
   renderLoadingMessage() {
-    render(this._container.getElement(), this._loadingFilmList);
+    render(this._container.getElement(), this._loadingFilmListComponent);
   }
 
   removeLoadingMessage() {
-    remove(this._loadingFilmList);
+    remove(this._loadingFilmListComponent);
   }
 
   render() {
@@ -102,24 +96,24 @@ export default class PageController {
     const films = this._filmsModel.getFilms();
     // Если фильмов нет, то показываем соответствующее сообщение
     if (films.length === 0) {
-      render(this._container.getElement(), this._noFilmList);
+      render(this._container.getElement(), this._noFilmListComponent);
       return;
     }
 
     // Все фильмы (отфильтрованные фильмы)
-    render(this._container.getElement(), this._mainFilmList);
+    render(this._container.getElement(), this._mainFilmListComponent);
     this._renderFilms(films.slice(0, this._showingFilmCount));
     this._renderLoadMoreButton(films);
 
     // Top rated фильмы
     const topRatedFilms = getTopRatedFilms(films, EXTRA_FILM_COUNT);
     if (topRatedFilms.length > 0) {
-      render(this._container.getElement(), this._topRatedFilmList);
-      this._topRatedFilmControllers = this._renderFilmCollection(this._topRatedFilmList, topRatedFilms);
+      render(this._container.getElement(), this._topRatedFilmListComponent);
+      this._topRatedFilmControllers = this._renderFilmCollection(this._topRatedFilmListComponent, topRatedFilms);
     }
 
     // Most commented фильмы
-    render(this._container.getElement(), this._mostCommentedFilmList);
+    render(this._container.getElement(), this._mostCommentedFilmListComponent);
     this._renderMostCommentedFilms();
   }
 
@@ -150,7 +144,7 @@ export default class PageController {
       return;
     }
 
-    render(this._mainFilmList.getElement(), this._showMoreButtonComponent);
+    render(this._mainFilmListComponent.getElement(), this._showMoreButtonComponent);
 
     this._showMoreButtonComponent.setClickHandler(() => {
       const prevFilmCount = this._showingFilmCount;
@@ -170,7 +164,7 @@ export default class PageController {
   }
 
   _renderFilms(films) {
-    const newFilmControllers = this._renderFilmCollection(this._mainFilmList, films);
+    const newFilmControllers = this._renderFilmCollection(this._mainFilmListComponent, films);
     this._showedFilmControllers = this._showedFilmControllers.concat(newFilmControllers);
 
     this._showingFilmCount = this._showedFilmControllers.length;
@@ -188,11 +182,11 @@ export default class PageController {
     const mostCommentedFilms = getMostCommentedFilms(films, EXTRA_FILM_COUNT);
     if (mostCommentedFilms.length === 0) {
       // Блок нужно спрятать, если нет больше фильмов с комментариями
-      this._mostCommentedFilmList.hide();
+      this._mostCommentedFilmListComponent.hide();
     } else {
-      remove(this._mostCommentedFilmList.getContainerComponent());
-      this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmList, mostCommentedFilms);
-      this._mostCommentedFilmList.show();
+      remove(this._mostCommentedFilmListComponent.getContainerComponent());
+      this._mostCommentedFilmControllers = this._renderFilmCollection(this._mostCommentedFilmListComponent, mostCommentedFilms);
+      this._mostCommentedFilmListComponent.show();
     }
   }
 

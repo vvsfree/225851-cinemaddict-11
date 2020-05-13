@@ -22,13 +22,13 @@ import CommentsModel from "./models/comments.js";
 
 // Отрисовка элементов
 import {render} from "./utils/render.js";
-import {MenuItemType, FilterType} from "./const.js";
+import {MenuItemType, FilterType, END_POINT, AUTHORIZATION, STORE_VER} from "./const.js";
 import {getRating, getStoreName} from "./utils/common.js";
 import {getFilmsByFilter} from "./utils/filter.js";
 
-const END_POINT = `https://11.ecmascript.pages.academy/cinemaddict`;
-const AUTHORIZATION = `Basic 001w590ik29889a=`;
-const STORE_VER = `v1`;
+const siteHeaderElement = document.querySelector(`.header`);
+const siteMainElement = document.querySelector(`.main`);
+const siteFooterElement = document.querySelector(`.footer`);
 
 const api = new API(END_POINT, AUTHORIZATION);
 const filmStore = new Store(getStoreName(`film`, STORE_VER), window.localStorage);
@@ -38,10 +38,6 @@ const apiWithProvider = new Provider(api, filmStore, commentStore);
 const filmsModel = new FilmsModel();
 const commentsModel = new CommentsModel();
 const models = {filmsModel, commentsModel};
-
-const siteHeaderElement = document.querySelector(`.header`);
-const siteMainElement = document.querySelector(`.main`);
-const siteFooterElement = document.querySelector(`.footer`);
 
 // Профиль (звание) пользователя в шапке сайта и статистике
 const profileComponent = new ProfileComponent();

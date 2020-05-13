@@ -1,4 +1,27 @@
+export const HIDDEN_CLASS = `visually-hidden`;
+
+export const SHOWING_FILM_COUNT_ON_START = 5;
+export const SHOWING_FILM_COUNT_BY_BUTTON = 5;
+
+// Максимальное количество фильмов в блоках «Top rated movies» и «Most commented»
+export const EXTRA_FILM_COUNT = 2;
+
+export const END_POINT = `https://11.ecmascript.pages.academy/cinemaddict`;
+export const AUTHORIZATION = `Basic 001w590ik29889a=`;
+export const STORE_VER = `v1`;
+
+export const OUTPUT_FORMAT = `DD MMMM YYYY`;
+
+export const SHAKE_ANIMATION_TIMEOUT = 600;
+
 export const EMOJIS = [`smile`, `sleeping`, `puke`, `angry`];
+
+export const Method = {
+  GET: `GET`,
+  POST: `POST`,
+  PUT: `PUT`,
+  DELETE: `DELETE`
+};
 
 export const FilterType = {
   ALL: `all`,
@@ -36,5 +59,3 @@ export const Rating = {
   FAN: `Fan`,
   MOVIE_BUFF: `Movie Buff`
 };
-
-export const SHAKE_ANIMATION_TIMEOUT = 600;
